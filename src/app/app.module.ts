@@ -16,9 +16,20 @@ export class AComponent {}
   selector: 'b-comp',
   template: `
     <button routerLink="/a">Navigate to A route</button>
-    <p routerLink="/a" tabindex="1">Navigate to A route</p>
-    <a routerLink="/a">Navigate to A route</a>
-  `
+    <p routerLink="/b" tabindex="1" routerLinkActive="pClass">Navigate to A route</p>
+    <a routerLink="/b" routerLinkActive="aClass bClass" [routerLinkActiveOptions]="{exact: true}">Navigate to A route</a>
+  `,
+  styles: [`
+    .pClass {
+        background-color: red;
+    }
+    .aClass {
+        background-color: blue;
+    }
+    .bClass {
+        font-size: large;
+    }
+  `]
 })
 export class BComponent {
   name = 'lx1036';
