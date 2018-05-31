@@ -277,7 +277,13 @@ export class DefaultUrlSerializer implements UrlSerializer {
   /** Parses a url into a `UrlTree` */
   parse(url: string): UrlTree {
     const p = new UrlParser(url);
-    return new UrlTree(p.parseRootSegment(), p.parseQueryParams(), p.parseFragment());
+
+    const rootSegment = p.parseRootSegment();
+    const queryParams = p.parseQueryParams();
+    const fragment = p.parseFragment();
+
+    console.log('urlTree', rootSegment, queryParams, fragment);
+    return new UrlTree(rootSegment, queryParams, fragment);
   }
 
   /** Converts a `UrlTree` into a url */
