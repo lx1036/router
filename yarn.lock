@@ -5701,6 +5701,10 @@ symbol-observable@^1.2.0:
   version "1.2.0"
   resolved "http://registry.npm.taobao.org/symbol-observable/download/symbol-observable-1.2.0.tgz#c22688aed4eab3cdc2dfeacbb561660560a00804"
 
+systemjs@^0.21.3:
+  version "0.21.3"
+  resolved "http://registry.npm.taobao.org/systemjs/download/systemjs-0.21.3.tgz#76467a34a9a12ead3b11028a27345f7649e46204"
+
 tapable@^1.0.0:
   version "1.0.0"
   resolved "http://registry.npm.taobao.org/tapable/download/tapable-1.0.0.tgz#cbb639d9002eed9c6b5975eb20598d7936f1f9f2"
