@@ -169,12 +169,6 @@
   dependencies:
     tslib "^1.9.0"
 
-"@angular/router@^6.0.3":
-  version "6.0.3"
-  resolved "http://registry.npm.taobao.org/@angular/router/download/@angular/router-6.0.3.tgz#c2b63401c30788b78c90e4209cd06a653eae6428"
-  dependencies:
-    tslib "^1.9.0"
-
 "@ngtools/webpack@6.0.7":
   version "6.0.7"
   resolved "http://registry.npm.taobao.org/@ngtools/webpack/download/@ngtools/webpack-6.0.7.tgz#e396330756c1d8999abc224aeb23d0011662f77b"
