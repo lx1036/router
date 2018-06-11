@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import {Component, NgModule} from '@angular/core';
+import {Component, ComponentRef, Injector, NgModule, NgModuleFactory, NgModuleFactoryLoader, OnInit} from '@angular/core';
 
 import {ActivatedRoute, PRIMARY_OUTLET, Router, RouterModule, Routes, UrlSegment, UrlSegmentGroup, UrlTree} from '@angular/router';
 
@@ -20,7 +20,7 @@ export class AComponent {}
     <a routerLink="/b" routerLinkActive="aClass bClass" [routerLinkActiveOptions]="{exact: true}">Navigate to A route</a>
     
     <h2>RouterOutlet</h2>
-    <button [routerLink]="['a', {outlets: {feature: ['c']}}]">Navigate to C route</button>
+    <button [routerLink]="['/', {outlets: {feature: ['c']}}]">Navigate to C route</button>
     
     <h2>Navigate</h2>
     <button (click)="navigate()">Navigate</button>
@@ -72,7 +72,22 @@ export class BComponent {
     <router-outlet name="feature"></router-outlet>
   `
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
+  constructor(private loader: NgModuleFactoryLoader, private _injector: Injector) {}
+
+  ngOnInit() {
+    /*this.loader.load('./lazy.module#LazyModule').then((ngModuleFactory: NgModuleFactory<any>) => {
+      const moduleRef = ngModuleFactory.create(this._injector);
+
+      if (moduleRef.componentFactoryResolver) {
+        // console.log(moduleRef.componentFactoryResolver.resolveComponentFactory(LazyLoadComponent));
+      }
+
+      // const componentRef: ComponentRef<LazyLoadComponent> = moduleRef.componentFactoryResolver.resolveComponentFactory(LazyLoadComponent).create(this._injector);
+      // console.log(`${componentRef.instance}: `, componentRef.hostView, componentRef.location);
+    });*/
+  }
+
   onActivate(value) {
     console.log('activate', value);
   }
@@ -88,6 +103,7 @@ const routes: Routes = [ // Routes -> Router[setupRouter()]
   {path: 'a', component: AComponent},
   {path: 'b', component: BComponent},
   {path: 'c', component: AComponent, outlet: 'feature'},
+  {path: 'd', loadChildren: './lazy.module#LazyModule'},
 ];
 
 @NgModule({

@@ -298,6 +298,9 @@ export class Router {
    */
   initialNavigation(): void {
     this.setUpLocationChangeListener();
+
+    console.log(`navigationId: ${this.navigationId}`);
+
     if (this.navigationId === 0) {
       this.navigateByUrl(this.location.path(true), {replaceUrl: true});
     }
