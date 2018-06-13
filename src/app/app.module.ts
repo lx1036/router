@@ -1,7 +1,17 @@
 import { BrowserModule } from '@angular/platform-browser';
 import {Component, ComponentRef, Injector, NgModule, NgModuleFactory, NgModuleFactoryLoader, OnInit} from '@angular/core';
 
-import {ActivatedRoute, PRIMARY_OUTLET, Router, RouterModule, Routes, UrlSegment, UrlSegmentGroup, UrlTree} from '@angular/router';
+import {
+  ActivatedRoute,
+  PreloadAllModules,
+  PRIMARY_OUTLET,
+  Router,
+  RouterModule,
+  Routes,
+  UrlSegment,
+  UrlSegmentGroup,
+  UrlTree
+} from '@angular/router';
 
 
 @Component({
@@ -10,7 +20,9 @@ import {ActivatedRoute, PRIMARY_OUTLET, Router, RouterModule, Routes, UrlSegment
     <button routerLink="/b">Navigate to B route</button>
   `
 })
-export class AComponent {}
+export class AComponent {
+  name = 'a';
+}
 
 @Component({
   selector: 'b-comp',
@@ -24,6 +36,9 @@ export class AComponent {}
     
     <h2>Navigate</h2>
     <button (click)="navigate()">Navigate</button>
+    
+    <h2>LazyLoad</h2>
+    <button routerLink="/lazy">lazyload</button>
   `,
   styles: [`
     .pClass {
@@ -103,7 +118,7 @@ const routes: Routes = [ // Routes -> Router[setupRouter()]
   {path: 'a', component: AComponent},
   {path: 'b', component: BComponent},
   {path: 'c', component: AComponent, outlet: 'feature'},
-  {path: 'd', loadChildren: './lazy.module#LazyModule'},
+  {path: 'lazy', loadChildren: './lazy.module#LazyLoadModule'},
 ];
 
 @NgModule({
@@ -114,6 +129,7 @@ const routes: Routes = [ // Routes -> Router[setupRouter()]
   ],
   imports: [
     BrowserModule,
+    // RouterModule.forRoot(routes, {enableTracing: false, preloadingStrategy: PreloadAllModules}), // PreLoad lazy load modules
     RouterModule.forRoot(routes, {enableTracing: false}), // Routes is built for Router
   ],
   providers: [],
