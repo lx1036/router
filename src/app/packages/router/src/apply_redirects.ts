@@ -125,6 +125,7 @@ class ApplyRedirects {
       return this.expandChildren(ngModule, routes, segmentGroup)
           .pipe(map((children: any) => new UrlSegmentGroup([], children)));
     }
+    console.log('segmentGroup', segmentGroup);
 
     return this.expandSegment(ngModule, segmentGroup, routes, segmentGroup.segments, outlet, true);
   }

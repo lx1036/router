@@ -38,7 +38,7 @@ export class AComponent {
     <button (click)="navigate()">Navigate</button>
     
     <h2>LazyLoad</h2>
-    <button routerLink="/lazy">lazyload</button>
+    <button routerLink="/lazy/lazy">lazyload</button>
   `,
   styles: [`
     .pClass {
@@ -88,7 +88,10 @@ export class BComponent {
   `
 })
 export class AppComponent implements OnInit {
-  constructor(private loader: NgModuleFactoryLoader, private _injector: Injector) {}
+  constructor(private _loader: NgModuleFactoryLoader, private _injector: Injector) {
+    console.log('NgModuleFactoryLoader', _loader.constructor.name, _injector.get(NgModuleFactoryLoader));
+
+  }
 
   ngOnInit() {
     /*this.loader.load('./lazy.module#LazyModule').then((ngModuleFactory: NgModuleFactory<any>) => {
