@@ -95,7 +95,6 @@ export class BComponent {
 export class AppComponent implements OnInit {
   constructor(private _loader: NgModuleFactoryLoader, private _injector: Injector) {
     console.log('NgModuleFactoryLoader', _loader.constructor.name, _injector.get(NgModuleFactoryLoader));
-
   }
 
   ngOnInit() {
@@ -138,9 +137,9 @@ const routes: Routes = [ // Routes -> Router[setupRouter()]
   imports: [
     BrowserModule,
     // RouterModule.forRoot(routes, {enableTracing: false, preloadingStrategy: PreloadAllModules}), // PreLoad lazy load modules
-    RouterModule.forRoot(routes, {enableTracing: false}),
+    RouterModule.forRoot(routes, {enableTracing: false}), // Routes is built for Router
     StoreModule.forRoot(reducers, { metaReducers }),
-    !environment.production ? StoreDevtoolsModule.instrument() : [], // Routes is built for Router
+    !environment.production ? StoreDevtoolsModule.instrument() : [],
     StoreRouterConnectingModule.forRoot({stateKey: 'router'}),
   ],
   providers: [],
