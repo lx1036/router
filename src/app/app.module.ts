@@ -13,10 +13,11 @@ import {
   UrlTree
 } from '@angular/router';
 import { StoreModule } from '@ngrx/store';
-import { reducers, metaReducers } from './reducers';
+import {reducers, metaReducers, UserEffects} from './reducers';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from '../environments/environment';
 import {StoreRouterConnectingModule} from '@ngrx/router-store';
+import { EffectsModule } from '@ngrx/effects';
 
 
 @Component({
@@ -141,6 +142,7 @@ const routes: Routes = [ // Routes -> Router[setupRouter()]
     StoreModule.forRoot(reducers, { metaReducers }),
     !environment.production ? StoreDevtoolsModule.instrument() : [],
     StoreRouterConnectingModule.forRoot({stateKey: 'router'}),
+    EffectsModule.forRoot([UserEffects]),
   ],
   providers: [],
   bootstrap: [AppComponent]
