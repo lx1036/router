@@ -277,13 +277,7 @@ export class DefaultUrlSerializer implements UrlSerializer {
   /** Parses a url into a `UrlTree` */
   parse(url: string): UrlTree {
     const p = new UrlParser(url);
-
-    const rootSegment = p.parseRootSegment();
-    const queryParams = p.parseQueryParams();
-    const fragment = p.parseFragment();
-
-    console.log('urlTree', rootSegment, queryParams, fragment);
-    return new UrlTree(rootSegment, queryParams, fragment);
+    return new UrlTree(p.parseRootSegment(), p.parseQueryParams(), p.parseFragment());
   }
 
   /** Converts a `UrlTree` into a url */
@@ -412,7 +406,7 @@ function serializeQueryParams(params: {[key: string]: any}): string {
   return strParams.length ? `?${strParams.join("&")}` : '';
 }
 
-const SEGMENT_RE = /^[^\/()?;=#]+/;
+const SEGMENT_RE = /^[^\/()?;=&#]+/;
 function matchSegments(str: string): string {
   const match = str.match(SEGMENT_RE);
   return match ? match[0] : '';

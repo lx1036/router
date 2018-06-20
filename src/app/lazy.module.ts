@@ -1,6 +1,7 @@
 import {Component, Injector, NgModule} from '@angular/core';
 import {Router, RouterModule} from '@angular/router';
 import {AComponent} from './app.module';
+import {Observable, interval} from 'rxjs';
 
 
 @Component({
@@ -17,6 +18,8 @@ export class LazyLoadComponent {
     console.log(aComponent.name);
 
     console.log(_injector.get(Router), _injector);
+
+    const interval$ = interval(3000);
   }
 }
 

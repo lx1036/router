@@ -140,8 +140,6 @@ export class RouterLink {
   }
 
   get urlTree(): UrlTree {
-    console.log(this.commands);
-
     return this.router.createUrlTree(this.commands, {
       relativeTo: this.route,
       queryParams: this.queryParams,

@@ -350,10 +350,9 @@ export function rootRoute(router: Router): ActivatedRoute {
 /**
  * To initialize the router properly we need to do in two steps:
  *
- * First, we need to start the navigation in a APP_INITIALIZER to block the bootstrap if
- * a resolver or a guards executes asynchronously.
- *
- * Second, we need to actually run activation in a BOOTSTRAP_LISTENER. We utilize the afterPreactivation
+ * We need to start the navigation in a APP_INITIALIZER to block the bootstrap if
+ * a resolver or a guards executes asynchronously. Second, we need to actually run
+ * activation in a BOOTSTRAP_LISTENER. We utilize the afterPreactivation
  * hook provided by the router to do that.
  *
  * The router navigation starts, reaches the point when preactivation is done, and then
@@ -368,14 +367,11 @@ export class RouterInitializer {
 
   appInitializer(): Promise<any> {
     const p: Promise<any> = this.injector.get(LOCATION_INITIALIZED, Promise.resolve(null));
-
     return p.then(() => {
       let resolve: Function = null !;
       const res = new Promise(r => resolve = r);
       const router = this.injector.get(Router);
       const opts = this.injector.get(ROUTER_CONFIGURATION);
-
-      console.log('opts:', opts);
 
       if (this.isLegacyDisabled(opts) || this.isLegacyEnabled(opts)) {
         resolve(true);
@@ -387,9 +383,6 @@ export class RouterInitializer {
       } else if (opts.initialNavigation === 'enabled') {
         router.hooks.afterPreactivation = () => {
           // only the initial navigation should be delayed
-
-          console.log(`initNavigation: ${this.initNavigation}`);
-
           if (!this.initNavigation) {
             this.initNavigation = true;
             resolve(true);
@@ -400,7 +393,6 @@ export class RouterInitializer {
             return of (null) as any;
           }
         };
-
         router.initialNavigation();
 
       } else {

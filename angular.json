@@ -118,5 +118,8 @@
       }
     }
   },
-  "defaultProject": "router"
+  "defaultProject": "router",
+  "cli": {
+    "defaultCollection": "@ngrx/schematics"
+  }
 }

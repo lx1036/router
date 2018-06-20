@@ -7,6 +7,8 @@
   },
   "exclude": [
     "src/test.ts",
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "**/__name@dasherize@if-flat__/**",
+    "**/__statePath__/*"
   ]
 }

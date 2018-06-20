@@ -12,6 +12,11 @@ import {
   UrlSegmentGroup,
   UrlTree
 } from '@angular/router';
+import { StoreModule } from '@ngrx/store';
+import { reducers, metaReducers } from './reducers';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { environment } from '../environments/environment';
+import {StoreRouterConnectingModule} from '@ngrx/router-store';
 
 
 @Component({
@@ -133,7 +138,10 @@ const routes: Routes = [ // Routes -> Router[setupRouter()]
   imports: [
     BrowserModule,
     // RouterModule.forRoot(routes, {enableTracing: false, preloadingStrategy: PreloadAllModules}), // PreLoad lazy load modules
-    RouterModule.forRoot(routes, {enableTracing: false}), // Routes is built for Router
+    RouterModule.forRoot(routes, {enableTracing: false}),
+    StoreModule.forRoot(reducers, { metaReducers }),
+    !environment.production ? StoreDevtoolsModule.instrument() : [], // Routes is built for Router
+    StoreRouterConnectingModule.forRoot({stateKey: 'router'}),
   ],
   providers: [],
   bootstrap: [AppComponent]

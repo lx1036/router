@@ -30,9 +30,6 @@ export function createUrlTree(
       updateSegmentGroupChildren(
           startingPosition.segmentGroup, startingPosition.index, nav.commands) :
       updateSegmentGroup(startingPosition.segmentGroup, startingPosition.index, nav.commands);
-
-  console.log('SegmentGroup', segmentGroup.toString());
-
   return tree(startingPosition.segmentGroup, segmentGroup, urlTree, queryParams, fragment);
 }
 
@@ -135,8 +132,6 @@ function computeNavigation(commands: any[]): Navigation {
 
     return [...res, cmd];
   }, []);
-
-  // console.log(isAbsolute, numberOfDoubleDots, res); // false, 0, {outlets: {xxx}}
 
   return new Navigation(isAbsolute, numberOfDoubleDots, res);
 }

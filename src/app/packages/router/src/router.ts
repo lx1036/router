@@ -298,9 +298,6 @@ export class Router {
    */
   initialNavigation(): void {
     this.setUpLocationChangeListener();
-
-    console.log(`navigationId: ${this.navigationId}`);
-
     if (this.navigationId === 0) {
       this.navigateByUrl(this.location.path(true), {replaceUrl: true});
     }
@@ -624,8 +621,6 @@ export class Router {
       // create an observable of the url and route state snapshot
       // this operation do not result in any side effects
       let urlAndSnapshot$: Observable<NavStreamValue>;
-
-      console.log('precreatedState', precreatedState);
       if (!precreatedState) {
         const moduleInjector = this.ngModule.injector;
         const redirectsApplied$ =

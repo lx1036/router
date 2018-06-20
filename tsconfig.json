@@ -3,7 +3,9 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "@angular/router": ["src/app/packages/router"]
+      "@angular/router": ["src/app/packages/router"],
+      "@ngrx/*": ["src/app/packages/ngrx/*"]
+
     },
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
