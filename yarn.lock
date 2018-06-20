@@ -114,12 +114,6 @@
     symbol-observable "^1.2.0"
     yargs-parser "^10.0.0"
 
-"@angular/common@^6.0.3":
-  version "6.0.3"
-  resolved "http://registry.npm.taobao.org/@angular/common/download/@angular/common-6.0.3.tgz#8b2af3bb74add35c10cd969a5d179cb6a8b21545"
-  dependencies:
-    tslib "^1.9.0"
-
 "@angular/compiler-cli@^6.0.3":
   version "6.0.3"
   resolved "http://registry.npm.taobao.org/@angular/compiler-cli/download/@angular/compiler-cli-6.0.3.tgz#4cdda9f28e3387811423c980f3e195ac2322057d"
@@ -132,12 +126,6 @@
 "@angular/compiler@^6.0.3":
   version "6.0.3"
   resolved "http://registry.npm.taobao.org/@angular/compiler/download/@angular/compiler-6.0.3.tgz#47e988012e94f9e3477a4c5557c997d7910a3b2d"
-  dependencies:
-    tslib "^1.9.0"
-
-"@angular/core@^6.0.3":
-  version "6.0.3"
-  resolved "http://registry.npm.taobao.org/@angular/core/download/@angular/core-6.0.3.tgz#50502115105c3784d24338dd8ffb7dddcb55b58d"
   dependencies:
     tslib "^1.9.0"
 
@@ -156,18 +144,6 @@
 "@angular/language-service@^6.0.3":
   version "6.0.3"
   resolved "http://registry.npm.taobao.org/@angular/language-service/download/@angular/language-service-6.0.3.tgz#7182f3824520fd5f5f6173fdee80284356d29d08"
-
-"@angular/platform-browser-dynamic@^6.0.3":
-  version "6.0.3"
-  resolved "http://registry.npm.taobao.org/@angular/platform-browser-dynamic/download/@angular/platform-browser-dynamic-6.0.3.tgz#b27e26c06df4ce34879cefd818e7ff394764f834"
-  dependencies:
-    tslib "^1.9.0"
-
-"@angular/platform-browser@^6.0.3":
-  version "6.0.3"
-  resolved "http://registry.npm.taobao.org/@angular/platform-browser/download/@angular/platform-browser-6.0.3.tgz#67941ac1dc0e89c1a18bb97ef17d574f469be6d2"
-  dependencies:
-    tslib "^1.9.0"
 
 "@angular/upgrade@^6.0.5":
   version "6.0.5"
@@ -205,6 +181,10 @@
     rxjs "^6.0.0"
     semver "^5.3.0"
     semver-intersect "^1.1.2"
+
+"@types/hammerjs@^2.0.35":
+  version "2.0.35"
+  resolved "http://registry.npm.taobao.org/@types/hammerjs/download/@types/hammerjs-2.0.35.tgz#7b7c950c7d54593e23bffc8d2b4feba9866a7277"
 
 "@types/jasmine@*", "@types/jasmine@~2.8.6":
   version "2.8.7"
@@ -2587,6 +2567,10 @@ globule@^1.0.0:
 graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6:
   version "4.1.11"
   resolved "http://registry.npm.taobao.org/graceful-fs/download/graceful-fs-4.1.11.tgz#0e8bdfe4d1ddb8854d64e04ea7c00e2a026e5658"
+
+hammerjs@^2.0.8:
+  version "2.0.8"
+  resolved "http://registry.npm.taobao.org/hammerjs/download/hammerjs-2.0.8.tgz#04ef77862cff2bb79d30f7692095930222bf60f1"
 
 handle-thing@^1.2.5:
   version "1.2.5"
