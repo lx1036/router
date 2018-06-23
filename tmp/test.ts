@@ -9,3 +9,8 @@
 import {AComponent, a } from './modules';
 
 console.log(AComponent, a);
+
+let c = {cc: 'cc'};
+let d = c;
+c.cc = 'xxx';
+console.log(d,c);

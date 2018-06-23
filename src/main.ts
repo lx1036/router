@@ -15,18 +15,19 @@ import {JitCompilerFactory} from './app/packages/angular/platform-browser-dynami
 import {BrowserPlatformLocation} from './app/packages/angular/platform-browser/src/browser/location/browser_platform_location';
 import {_document, initDomAdapter} from './app/packages/angular/platform-browser/src/browser';
 import {DOCUMENT} from './app/packages/angular/platform-browser/src/dom/dom_tokens';
+import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 
 if (environment.production) {
   enableProdMode();
 }
 
-// platformBrowserDynamic().bootstrapModule(AppModule)
-//   .catch(err => console.log(err));
+platformBrowserDynamic().bootstrapModule(AppModule)
+  .catch(err => console.log(err));
 
 
 
 
-export const platformCore: ((extraProviders?: StaticProvider[]) => PlatformRef) = createPlatformFactory(null, 'core', [
+/*export const platformCore: ((extraProviders?: StaticProvider[]) => PlatformRef) = createPlatformFactory(null, 'core', [
   // Set a default platform name for platforms that don't set it explicitly.
   {provide: PLATFORM_ID, useValue: 'unknown'},
   {provide: PlatformRef, deps: [Injector]},
@@ -57,5 +58,5 @@ const platformBrowserDynamicTest =createPlatformFactory(platformCoreDynamic, 'br
 
 const platformRef: PlatformRef = platformBrowserDynamicTest();
 
-console.log(platformRef.injector);
+console.log(platformRef.injector);*/
 

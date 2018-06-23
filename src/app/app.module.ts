@@ -13,11 +13,18 @@ import {
   UrlTree
 } from '@angular/router';
 import { StoreModule } from '@ngrx/store';
-import {reducers, metaReducers, UserEffects} from './reducers';
+import {metaReducers, UserEffects, AuthEffects, stateReducerMap} from './store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from '../environments/environment';
 import {StoreRouterConnectingModule} from '@ngrx/router-store';
 import { EffectsModule } from '@ngrx/effects';
+import {LoginComponent} from './components/login/login.component';
+import {SignUpComponent} from './components/sign-up/sign-up.component';
+import {LandingComponent} from './components/landing/landing.component';
+import {FormsModule} from '@angular/forms';
+import {HTTP_INTERCEPTORS, HttpClientModule} from './packages/angular/common/http';
+import {AuthGuardService, AuthService, ErrorInterceptor, TokenInterceptor} from './services/auth.service';
+import {StatusComponent} from './components/status/status.component';
 
 
 @Component({
@@ -95,7 +102,7 @@ export class BComponent {
 })
 export class AppComponent implements OnInit {
   constructor(private _loader: NgModuleFactoryLoader, private _injector: Injector) {
-    console.log('NgModuleFactoryLoader', _loader.constructor.name, _injector.get(NgModuleFactoryLoader));
+    // console.log('NgModuleFactoryLoader', _loader.constructor.name, _injector.get(NgModuleFactoryLoader));
   }
 
   ngOnInit() {
@@ -122,11 +129,17 @@ export class AppComponent implements OnInit {
 
 
 const routes: Routes = [ // Routes -> Router[setupRouter()]
-  {path: '', pathMatch: 'full', redirectTo: 'a'},
+  // {path: '', pathMatch: 'full', redirectTo: 'a'},
   {path: 'a', component: AComponent},
   {path: 'b', component: BComponent},
   {path: 'c', component: AComponent, outlet: 'feature'},
   {path: 'lazy', loadChildren: './lazy.module#LazyLoadModule'},
+
+  {path: 'log-in', component: LoginComponent},
+  {path: 'sign-up', component: SignUpComponent},
+  {path: 'status', component: StatusComponent, canActivate: [AuthGuardService]},
+  {path: '', component: LandingComponent},
+  {path: '**', redirectTo: '/'}
 ];
 
 @NgModule({
@@ -134,17 +147,38 @@ const routes: Routes = [ // Routes -> Router[setupRouter()]
     AppComponent,
     AComponent,
     BComponent,
+
+    LoginComponent,
+    SignUpComponent,
+    LandingComponent,
+    StatusComponent,
   ],
   imports: [
     BrowserModule,
+    FormsModule,
+    HttpClientModule,
+
     // RouterModule.forRoot(routes, {enableTracing: false, preloadingStrategy: PreloadAllModules}), // PreLoad lazy load modules
     RouterModule.forRoot(routes, {enableTracing: false}), // Routes is built for Router
-    StoreModule.forRoot(reducers, { metaReducers }),
+    StoreModule.forRoot(stateReducerMap, { metaReducers }),
     !environment.production ? StoreDevtoolsModule.instrument() : [],
-    StoreRouterConnectingModule.forRoot({stateKey: 'router'}),
-    EffectsModule.forRoot([UserEffects]),
+    StoreRouterConnectingModule.forRoot({stateKey: 'routerState'}),
+    EffectsModule.forRoot([UserEffects, AuthEffects]),
   ],
-  providers: [],
+  providers: [
+    AuthService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TokenInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ErrorInterceptor,
+      multi: true
+    },
+    AuthGuardService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
