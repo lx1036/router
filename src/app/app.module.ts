@@ -2,11 +2,11 @@ import { BrowserModule } from '@angular/platform-browser';
 import {Component, ComponentRef, Injector, NgModule, NgModuleFactory, NgModuleFactoryLoader, OnInit} from '@angular/core';
 
 import {
-  ActivatedRoute,
+  ActivatedRoute, ActivatedRouteSnapshot,
   PreloadAllModules,
   PRIMARY_OUTLET,
   Router,
-  RouterModule,
+  RouterModule, RouterStateSnapshot,
   Routes,
   UrlSegment,
   UrlSegmentGroup,
@@ -31,10 +31,20 @@ import {StatusComponent} from './components/status/status.component';
   selector: 'a-comp',
   template: `
     <button routerLink="/b">Navigate to B route</button>
+    <router-outlet></router-outlet>
   `
 })
 export class AComponent {
   name = 'a';
+
+  constructor(private activatedRoute: Router) {
+// console.log('ActivatedRoute', _router.routerState.snapshot.root);
+//   _router.url.subscribe(urlSegments => {console.log('urlSegments', urlSegments);});
+console.log('ActivatedRoute: ', activatedRoute.routerState.snapshot);
+    // activatedRoute.params.subscribe((params) => console.log(params));
+//     _router.params.subscribe(params => console.log(params));
+    // console.log('AComponent', _router.queryParams);
+  }
 }
 
 @Component({
@@ -127,10 +137,48 @@ export class AppComponent implements OnInit {
   }
 }
 
+@Component({
+  selector: 'e',
+  template: `
+   <p>e</p>
+    <router-outlet></router-outlet>
+  `
+})
+export class EComponent {
+  constructor(private activatedRoute: ActivatedRoute) {
+    // _router.url.subscribe(urlSegments => console.log(urlSegments));
+    // console.log('AComponent', _router.queryParams);
+
+    activatedRoute.params.subscribe((params) => console.log(params));
+  }
+}
+
+@Component({
+  selector: 'f',
+  template: `
+   <p>e</p>
+  `
+})
+export class FComponent {
+  constructor(private _router: ActivatedRoute) {
+    // _router.url.subscribe(urlSegments => console.log(urlSegments));
+    // console.log('AComponent', _router.queryParams);
+  }
+}
+
 
 const routes: Routes = [ // Routes -> Router[setupRouter()]
   // {path: '', pathMatch: 'full', redirectTo: 'a'},
   {path: 'a', component: AComponent},
+  {path: '', pathMatch: 'full', redirectTo: 'a'},
+  {path: 'a/:id', component: AComponent, children:
+    [
+      {path: 'e/:id', component: EComponent, children: [
+          {path: 'f/:id', component: EComponent}
+        ]
+      }
+    ]
+  },
   {path: 'b', component: BComponent},
   {path: 'c', component: AComponent, outlet: 'feature'},
   {path: 'lazy', loadChildren: './lazy.module#LazyLoadModule'},
@@ -152,6 +200,8 @@ const routes: Routes = [ // Routes -> Router[setupRouter()]
     SignUpComponent,
     LandingComponent,
     StatusComponent,
+    EComponent,
+    FComponent,
   ],
   imports: [
     BrowserModule,

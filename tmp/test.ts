@@ -1,16 +1,25 @@
+import {BrowserModule} from '@angular/platform-browser';
+import {Component, NgModule, ApplicationRef} from '@angular/core';
 
-// yarn ts-node tmp/test.ts -> { __esModule: true, AComponent: [Function: AComponent], a: 'a' }
-// import * as SystemJS from 'systemjs';
-//
-// SystemJS.import('./tmp/modules.js').then((m) => {
-//   console.log(m);
-// });
-
-import {AComponent, a } from './modules';
-
-console.log(AComponent, a);
+@Component({
+  selector: 'test',
+  template: `
+    <p>test</p>
+  `
+})
+export class MyComponent {}
 
 let c = {cc: 'cc'};
 let d = c;
 c.cc = 'xxx';
 console.log(d,c);
+@NgModule({
+  imports: [BrowserModule],
+  declarations: [MyComponent],
+  entryComponents: [MyComponent]
+})
+export class MainModule {
+  constructor(appRef: ApplicationRef) {
+    appRef.bootstrap(MyComponent);
+  }
+}

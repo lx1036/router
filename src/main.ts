@@ -26,8 +26,8 @@ platformBrowserDynamic().bootstrapModule(AppModule)
 
 
 
-
-/*export const platformCore: ((extraProviders?: StaticProvider[]) => PlatformRef) = createPlatformFactory(null, 'core', [
+/*
+export const platformCore: ((extraProviders?: StaticProvider[]) => PlatformRef) = createPlatformFactory(null, 'core', [
   // Set a default platform name for platforms that don't set it explicitly.
   {provide: PLATFORM_ID, useValue: 'unknown'},
   {provide: PlatformRef, deps: [Injector]},
