@@ -14,12 +14,9 @@ export class LazyLoadComponent {
   constructor(private router: Router, private _injector: Injector) {
     console.log(router.url);
 
-    const aComponent = new AComponent();
-    console.log(aComponent.name);
-
     console.log(_injector.get(Router), _injector);
 
-    const interval$ = interval(3000);
+    // const interval$ = interval(3000);
   }
 }
 

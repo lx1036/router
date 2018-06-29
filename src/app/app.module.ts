@@ -170,13 +170,18 @@ export class FComponent {
 const routes: Routes = [ // Routes -> Router[setupRouter()]
   // {path: '', pathMatch: 'full', redirectTo: 'a'},
   {path: 'a', component: AComponent},
-  {path: '', pathMatch: 'full', redirectTo: 'a'},
+  {path: 'e/f/g', pathMatch: 'full', redirectTo: 'ee'},
   {path: 'a/:id', component: AComponent, children:
     [
       {path: 'e/:id', component: EComponent, children: [
           {path: 'f/:id', component: EComponent}
         ]
-      }
+      },
+      {path: 'relative/a/:id', redirectTo: 'a/:id'},
+      {path: 'absolute/a/:id', redirectTo: '/a/:id'},
+      // redirects can't be chained, redirect only once at the same level
+      {path: 'a/:id', redirectTo: 'absolute/a/:id'},
+      {path: 'a/:id', component: BComponent}
     ]
   },
   {path: 'b', component: BComponent},
@@ -187,7 +192,7 @@ const routes: Routes = [ // Routes -> Router[setupRouter()]
   {path: 'sign-up', component: SignUpComponent},
   {path: 'status', component: StatusComponent, canActivate: [AuthGuardService]},
   {path: '', component: LandingComponent},
-  {path: '**', redirectTo: '/'}
+  // {path: '**', redirectTo: '/'}
 ];
 
 @NgModule({

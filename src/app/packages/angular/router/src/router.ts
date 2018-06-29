@@ -622,11 +622,17 @@ export class Router {
       // this operation do not result in any side effects
       let urlAndSnapshot$: Observable<NavStreamValue>;
       if (!precreatedState) {
+        /**
+         * 1. Apply redirects(relative/absolute)
+         */
         const moduleInjector = this.ngModule.injector;
         const redirectsApplied$ =
             applyRedirects(moduleInjector, this.configLoader, this.urlSerializer, url, this.config);
 
         urlAndSnapshot$ = redirectsApplied$.pipe(mergeMap((appliedUrl: UrlTree) => {
+          /**
+           * 2. Construct router state by current URL, and get RouterStateSnapshot
+           */
           return recognize(
                      this.rootComponentType, this.config, appliedUrl, this.serializeUrl(appliedUrl),
                      this.paramsInheritanceStrategy)
@@ -670,6 +676,9 @@ export class Router {
             this.triggerEvent(new GuardsCheckStart(
                 id, this.serializeUrl(url), this.serializeUrl(appliedUrl), snapshot));
 
+            /**
+             * 3. PreActivation: Run Guard
+             */
             return preActivation.checkGuards().pipe(map((shouldActivate: boolean) => {
               this.triggerEvent(new GuardsCheckEnd(
                   id, this.serializeUrl(url), this.serializeUrl(appliedUrl), snapshot,
@@ -685,6 +694,9 @@ export class Router {
             if (p.shouldActivate && preActivation.isActivating()) {
               this.triggerEvent(new ResolveStart(
                   id, this.serializeUrl(url), this.serializeUrl(p.appliedUrl), p.snapshot));
+              /**
+               * 3. PreActivation: Run Resolver
+               */
               return preActivation.resolveData(this.paramsInheritanceStrategy).pipe(map(() => {
                 this.triggerEvent(new ResolveEnd(
                     id, this.serializeUrl(url), this.serializeUrl(p.appliedUrl), p.snapshot));
@@ -716,6 +728,9 @@ export class Router {
       }));
 
 
+      /**
+       * 4. Activation: Activate Components
+       */
       this.activateRoutes(
           routerState$, this.routerState, this.currentUrlTree, id, url, rawUrl, skipLocationChange,
           replaceUrl, resolvePromise, rejectPromise);
