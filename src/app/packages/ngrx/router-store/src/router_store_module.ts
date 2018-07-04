@@ -245,9 +245,8 @@ export class StoreRouterConnectingModule {
   }
 
   private setUpBeforePreactivationHook(): void {
-    (<any>this.router).hooks.beforePreactivation = (
-      routerState: RouterStateSnapshot
-    ) => {
+    // hook before the route navigation
+    (<any>this.router).hooks.beforePreactivation = (routerState: RouterStateSnapshot) => {
       this.routerState = this.serializer.serialize(routerState);
       if (this.shouldDispatchRouterNavigation()) {
         this.dispatchRouterNavigation();
@@ -271,12 +270,10 @@ export class StoreRouterConnectingModule {
   }
 
   private navigateIfNeeded(): void {
-    if (
-      !this.storeState[this.stateKey] ||
-      !this.storeState[this.stateKey].state
-    ) {
+    if (!this.storeState[this.stateKey] || !this.storeState[this.stateKey].state) {
       return;
     }
+
     if (this.dispatchTriggeredByRouter) return;
 
     if (this.router.url !== this.storeState[this.stateKey].state.url) {
