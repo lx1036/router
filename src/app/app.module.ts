@@ -1,11 +1,11 @@
 import { BrowserModule } from '@angular/platform-browser';
-import {Component, ComponentRef, Injector, NgModule, NgModuleFactory, NgModuleFactoryLoader, OnInit} from '@angular/core';
+import {Component, ComponentRef, Injectable, Injector, NgModule, NgModuleFactory, NgModuleFactoryLoader, OnInit} from '@angular/core';
 
 import {
-  ActivatedRoute, ActivatedRouteSnapshot,
+  ActivatedRoute, ActivatedRouteSnapshot, DetachedRouteHandle,
   PreloadAllModules,
   PRIMARY_OUTLET,
-  Router,
+  Router, RouteReuseStrategy,
   RouterModule, RouterStateSnapshot,
   Routes,
   UrlSegment,
@@ -25,6 +25,10 @@ import {FormsModule} from '@angular/forms';
 import {HTTP_INTERCEPTORS, HttpClientModule} from './packages/angular/common/http';
 import {AuthGuardService, AuthService, ErrorInterceptor, TokenInterceptor} from './services/auth.service';
 import {StatusComponent} from './components/status/status.component';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {map, pairwise, share, startWith} from 'rxjs/operators';
+import {animate, group, query, style, transition, trigger} from '@angular/animations';
+import {BrowserAnimationsModule} from './packages/angular/platform-browser/animations';
 
 
 @Component({
@@ -108,7 +112,15 @@ export class BComponent {
   template: `
     <router-outlet (activate)="onActivate($event)" (deactivate)="onDeactive($event)"></router-outlet>
     <router-outlet name="feature"></router-outlet>
-  `
+  `,
+  styles: [
+    `
+      :host {
+        display: block;
+        padding-top: 10px;
+      }
+    `
+  ]
 })
 export class AppComponent implements OnInit {
   constructor(private _loader: NgModuleFactoryLoader, private _injector: Injector) {
@@ -129,11 +141,11 @@ export class AppComponent implements OnInit {
   }
 
   onActivate(value) {
-    console.log('activate', value);
+    // console.log('activate', value);
   }
 
   onDeactive(value) {
-    console.log('deactivate', value);
+    // console.log('deactivate', value);
   }
 }
 
@@ -167,6 +179,143 @@ export class FComponent {
 }
 
 
+/**
+ * https://medium.com/frontend-coach/angular-router-animations-what-they-dont-tell-you-3d2737a7f20b -> RouteReuseStrategy
+ */
+export interface Item {
+  name: string;
+}
+
+@Injectable()
+export class ItemsService {
+  private items: Item[] = [
+    {name: 'Nectarine'},
+    {name: 'Pomelo'},
+    {name: 'Grape'},
+    {name: 'Avocado'},
+    {name: 'Strawberry'},
+    {name: 'Dragonfruit'},
+  ];
+
+  getItems(): Item[] {
+    return [...this.items];
+  }
+
+  getItemByIndex(index: number): Item {
+    return this.items[index];
+  }
+}
+
+// @Injectable()
+// export class ItemsRoutingService {
+//   itemChange$ = new BehaviorSubject<number>(0);
+// }
+
+let itemChange$ = new BehaviorSubject<number>(0);
+
+
+@Component({
+  selector: 'app-item',
+  template: `
+    <h2>Item: {{item.name}}</h2>
+    <p>Lorem ipsum dolor sit!</p>
+  `,
+  styles: [
+    `
+      :host {
+        display: block;
+        position: absolute;
+        margin-right: 20px;
+      }
+    `
+  ]
+})
+export class ItemComponent {
+  item: Item;
+
+  constructor(route: ActivatedRoute, itemsService: ItemsService) {
+    const { index } = route.snapshot.params;
+    this.item = itemsService.getItemByIndex(index);
+
+    itemChange$.next(+index);
+  }
+}
+
+@Component({
+  selector: 'app-items',
+  template: `
+    <nav class="navbar">
+      <div class="navbar-section">
+        <a *ngFor="let item of items; index as i" class="btn btn-link" routerLinkActive="active" [routerLink]="i">{{item.name}}</a>
+      </div>
+    </nav>
+
+    <div [@routeSlide]="routeTrigger$ | async" class="container">
+      <nav class="float-right">
+        <a [routerLink]="prev$ | async" [class.disabled]="(itemChange$ | async) === 0" class="btn btn-secondary btn-action btn-lg"><i class="icon icon-back"></i></a>
+        <a [routerLink]="next$ | async" [class.disabled]="(itemChange$ | async) === items.length - 1" class="btn btn-secondary btn-action btn-lg"><i class="icon icon-forward"></i></a>
+      </nav>
+
+      <router-outlet></router-outlet>
+    </div>
+  `,
+  styleUrls: ["./item-component.scss"],
+  animations: [
+    trigger('routeSlide', [
+      transition('* <=> *', [
+        group([
+          query(':enter', [
+            style({transform: 'translateX({{offsetEnter}}%)'}),
+            animate('0.4s ease-in-out', style({transform: 'translateX(0%)'}))
+          ], {optional: true}),
+          query(':leave', [
+            style({transform: 'translateX(0%)'}),
+            animate('0.4s ease-in-out', style({transform: 'translateX({{offsetLeave}}%)'}))
+          ], {optional: true}),
+        ])
+      ]),
+    ]),
+  ]
+})
+export class ItemsComponent {
+  items: Item[] = [];
+  itemChange$: BehaviorSubject<number>;
+  next$: Observable<number>;
+  prev$: Observable<number>;
+  routeTrigger$: Observable<object>;
+
+  constructor(itemsService: ItemsService) {
+    this.items = itemsService.getItems();
+    this.itemChange$ = itemChange$;
+
+    this.prev$ = this.itemChange$
+      .pipe(
+        map(index => index === 0 ? index : index - 1),
+        // share()
+      );
+
+    this.next$ = this.itemChange$
+      .pipe(
+        map(index => index === this.items.length - 1 ? index : index + 1),
+        // share()
+      );
+
+    this.routeTrigger$ = this.itemChange$
+      .pipe(
+        startWith(0),
+        pairwise(),
+        map(([prev, curr]) => ({
+          value: curr,
+          params: {
+            offsetEnter: prev > curr ? 100 : -100,
+            offsetLeave: prev > curr ? -100 : 100
+          }
+        })),
+      );
+  }
+}
+
+
 const routes: Routes = [ // Routes -> Router[setupRouter()]
   // {path: '', pathMatch: 'full', redirectTo: 'a'},
   {path: 'a', component: AComponent},
@@ -191,9 +340,51 @@ const routes: Routes = [ // Routes -> Router[setupRouter()]
   {path: 'log-in', component: LoginComponent},
   {path: 'sign-up', component: SignUpComponent},
   {path: 'status', component: StatusComponent, canActivate: [AuthGuardService]},
-  {path: '', component: LandingComponent},
+  // {path: '', component: LandingComponent},
   // {path: '**', redirectTo: '/'}
+
+
+  // Custom RouteReuseStrategy
+  {path: '', redirectTo: 'items', pathMatch: 'full'},
+  {path: 'items', component: ItemsComponent,
+    children: [
+      {path: '', redirectTo: '0', pathMatch: 'full'},
+      {path: ':index', component: ItemComponent}
+    ]
+  },
 ];
+
+
+export class CustomRouteReuseStrategy implements RouteReuseStrategy {
+  handlers: {[key: string]: DetachedRouteHandle} = {};
+
+  retrieve(route: ActivatedRouteSnapshot): DetachedRouteHandle | null {
+    if (!route.routeConfig) {
+      return null;
+    }
+
+    return this.handlers[route.routeConfig.path];
+  }
+
+  shouldAttach(route: ActivatedRouteSnapshot): boolean {
+    return false;
+  }
+
+  shouldDetach(route: ActivatedRouteSnapshot): boolean {
+    return !!route.routeConfig && !!this.handlers[route.routeConfig.path];
+  }
+
+  shouldReuseRoute(future: ActivatedRouteSnapshot, curr: ActivatedRouteSnapshot): boolean {
+    // console.log(curr.component);
+
+    return curr.component !== ItemComponent;
+  }
+
+  store(route: ActivatedRouteSnapshot, handle: DetachedRouteHandle | null): void {
+    this.handlers[route.routeConfig.path] = null;
+  }
+}
+
 
 @NgModule({
   declarations: [
@@ -207,9 +398,13 @@ const routes: Routes = [ // Routes -> Router[setupRouter()]
     StatusComponent,
     EComponent,
     FComponent,
+
+    ItemsComponent,
+    ItemComponent,
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     FormsModule,
     HttpClientModule,
 
@@ -221,6 +416,12 @@ const routes: Routes = [ // Routes -> Router[setupRouter()]
     EffectsModule.forRoot([UserEffects, AuthEffects]),
   ],
   providers: [
+    {
+      provide: RouteReuseStrategy,
+      useClass: CustomRouteReuseStrategy,
+    },
+    ItemsService,
+    // ItemsRoutingService,
     AuthService,
     {
       provide: HTTP_INTERCEPTORS,

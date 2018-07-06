@@ -19,6 +19,7 @@
     "bootstrap": "^4.1.1",
     "core-js": "^2.5.4",
     "rxjs": "^6.0.0",
+    "spectre.css": "^0.5.3",
     "systemjs": "^0.21.3",
     "zone.js": "^0.8.26"
   },
