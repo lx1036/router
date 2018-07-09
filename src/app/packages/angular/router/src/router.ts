@@ -626,6 +626,8 @@ export class Router {
          * 1. Apply redirects(relative/absolute)
          */
         const moduleInjector = this.ngModule.injector;
+
+        // console.log('config', this.config);
         const redirectsApplied$ =
             applyRedirects(moduleInjector, this.configLoader, this.urlSerializer, url, this.config);
 

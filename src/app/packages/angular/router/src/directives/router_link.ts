@@ -140,7 +140,7 @@ export class RouterLink {
   }
 
   get urlTree(): UrlTree {
-    return this.router.createUrlTree(this.commands, {
+    return this.router.createUrlTree(this.commands, { // this.commands = ['/team', teamId, 'user', userName, {details: true}]
       relativeTo: this.route,
       queryParams: this.queryParams,
       fragment: this.fragment,

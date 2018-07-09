@@ -3,6 +3,8 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
+      "@angular/animations": ["src/app/packages/angular/animations"],
+      "@angular/animations/browser": ["src/app/packages/angular/animations/browser"],
       "@angular/common": ["src/app/packages/angular/common"],
       "@angular/core": ["src/app/packages/angular/core"],
       "@angular/core/testing": ["src/app/packages/angular/core/testing"],

@@ -25,6 +25,8 @@ import {FormsModule} from '@angular/forms';
 import {HTTP_INTERCEPTORS, HttpClientModule} from './packages/angular/common/http';
 import {AuthGuardService, AuthService, ErrorInterceptor, TokenInterceptor} from './services/auth.service';
 import {StatusComponent} from './components/status/status.component';
+import {BrowserAnimationsModule} from './packages/angular/platform-browser/animations';
+import {animate, animateChild, group, query, sequence, stagger, style, transition, trigger} from '@angular/animations';
 
 
 @Component({
@@ -108,7 +110,41 @@ export class BComponent {
   template: `
     <router-outlet (activate)="onActivate($event)" (deactivate)="onDeactive($event)"></router-outlet>
     <router-outlet name="feature"></router-outlet>
-  `
+
+
+    <h2>Animations</h2>
+    <nav>
+      <a routerLink="/home" routerLinkActive="active">Home</a>
+      <a routerLink="/about" routerLinkActive="active">About</a>
+    </nav>
+    <main [@routerTransition]="getState(o)">
+      <router-outlet #o="outlet" name="animation"></router-outlet>
+    </main>
+  `,
+  animations: [
+    trigger('routerTransition', [
+      transition('* => *', [
+        query(':enter, :leave', style({ position: 'fixed', width:'100%' }), {optional: true}),
+        query(':enter', style({ transform: 'translateX(100%)' }), {optional: true}),
+        sequence([
+          query(':leave', animateChild(), {optional: true}),
+          group([
+            query(':leave', [
+              style({ transform: 'translateX(0%)' }),
+              animate('500ms cubic-bezier(.75,-0.48,.26,1.52)',
+                style({ transform: 'translateX(-100%)' }))
+            ], {optional: true}),
+            query(':enter', [
+              style({ transform: 'translateX(100%)' }),
+              animate('500ms cubic-bezier(.75,-0.48,.26,1.52)',
+                style({ transform: 'translateX(0%)' })),
+            ], {optional: true}),
+          ]),
+          query(':enter', animateChild(), {optional: true}),
+        ])
+      ])
+    ])
+  ]
 })
 export class AppComponent implements OnInit {
   constructor(private _loader: NgModuleFactoryLoader, private _injector: Injector) {
@@ -134,6 +170,10 @@ export class AppComponent implements OnInit {
 
   onDeactive(value) {
     console.log('deactivate', value);
+  }
+
+  getState(outlet) {
+    return outlet.activatedRouteData.state;
   }
 }
 
@@ -167,7 +207,57 @@ export class FComponent {
 }
 
 
+@Component({
+  selector: 'home',
+  template: `
+    <h1>Home</h1>
+    <div class="header">
+      <div class="block">&nbsp;</div>
+      <div class="block">&nbsp;</div>
+      <div class="block">&nbsp;</div>
+    </div>
+  `,
+  styles: [`
+    .block {
+      background: #eee;
+      float: left;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin: 5px;
+    }
+  `],
+  animations: [
+    trigger('homeTransition', [
+      transition(':enter', [
+        query('.block', style({ opacity: 0 }), {optional: true}),
+        query('.block', stagger(300, [
+          style({ transform: 'translateY(100px)' }),
+          animate('1s cubic-bezier(.75,-0.48,.26,1.52)', style({transform: 'translateY(0px)', opacity: 1})),
+        ]), {optional: true}),
+      ]),
+      transition(':leave', [
+        query('.block', stagger(300, [
+          style({ transform: 'translateY(0px)', opacity: 1 }),
+          animate('1s cubic-bezier(.75,-0.48,.26,1.52)', style({transform: 'translateY(100px)', opacity: 0})),
+        ]), {optional: true}),
+      ])
+    ])
+  ],
+})
+export class HomeComponent { }
+
+@Component({
+  selector: 'about',
+  template: `<h1>About</h1>`
+})
+export class AboutComponent { }
+
 const routes: Routes = [ // Routes -> Router[setupRouter()]
+  {path: '', redirectTo: 'about', pathMatch: 'full'},
+  {path: 'home', component: HomeComponent, data: { state: 'home'}, outlet: 'animation' },
+  {path: 'about', component: AboutComponent, data: { state: 'about'}, outlet: 'feature' },
+
   // {path: '', pathMatch: 'full', redirectTo: 'a'},
   {path: 'a', component: AComponent},
   {path: 'e/f/g', pathMatch: 'full', redirectTo: 'ee'},
@@ -191,7 +281,7 @@ const routes: Routes = [ // Routes -> Router[setupRouter()]
   {path: 'log-in', component: LoginComponent},
   {path: 'sign-up', component: SignUpComponent},
   {path: 'status', component: StatusComponent, canActivate: [AuthGuardService]},
-  {path: '', component: LandingComponent},
+  // {path: '', component: LandingComponent},
   // {path: '**', redirectTo: '/'}
 ];
 
@@ -207,18 +297,22 @@ const routes: Routes = [ // Routes -> Router[setupRouter()]
     StatusComponent,
     EComponent,
     FComponent,
+
+    HomeComponent,
+    AboutComponent,
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     FormsModule,
     HttpClientModule,
 
     // RouterModule.forRoot(routes, {enableTracing: false, preloadingStrategy: PreloadAllModules}), // PreLoad lazy load modules
-    RouterModule.forRoot(routes, {enableTracing: false}), // Routes is built for Router
-    StoreModule.forRoot(stateReducerMap, { metaReducers }),
-    !environment.production ? StoreDevtoolsModule.instrument() : [],
-    StoreRouterConnectingModule.forRoot({stateKey: 'routerState'}),
-    EffectsModule.forRoot([UserEffects, AuthEffects]),
+    RouterModule.forRoot(routes, {enableTracing: false, }), // Routes is built for Router
+    // StoreModule.forRoot(stateReducerMap, { metaReducers }),
+    // !environment.production ? StoreDevtoolsModule.instrument() : [],
+    // StoreRouterConnectingModule.forRoot({stateKey: 'routerState'}),
+    // EffectsModule.forRoot([UserEffects, AuthEffects]),
   ],
   providers: [
     AuthService,
