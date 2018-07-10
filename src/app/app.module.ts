@@ -27,6 +27,7 @@ import {AuthGuardService, AuthService, ErrorInterceptor, TokenInterceptor} from 
 import {StatusComponent} from './components/status/status.component';
 import {BrowserAnimationsModule} from './packages/angular/platform-browser/animations';
 import {animate, animateChild, group, query, sequence, stagger, style, transition, trigger} from '@angular/animations';
+import {Location} from '@angular/common';
 
 
 @Component({
@@ -120,6 +121,9 @@ export class BComponent {
     <main [@routerTransition]="getState(o)">
       <router-outlet #o="outlet" name="animation"></router-outlet>
     </main>
+    
+    
+    <button (click)="onLocation()">Location</button>
   `,
   animations: [
     trigger('routerTransition', [
@@ -147,8 +151,14 @@ export class BComponent {
   ]
 })
 export class AppComponent implements OnInit {
-  constructor(private _loader: NgModuleFactoryLoader, private _injector: Injector) {
+  constructor(private _loader: NgModuleFactoryLoader, private _injector: Injector, private _location: Location, private _router: Router) {
     // console.log('NgModuleFactoryLoader', _loader.constructor.name, _injector.get(NgModuleFactoryLoader));
+
+    console.log(_router.routerState.root);
+
+    const tree: UrlTree = _router.parseUrl('/section-one;test=one/(nav:navigation;test=two//main:about;test=three)?query=four#frag');
+    const primaryOutlet: UrlSegmentGroup = tree.root.children[PRIMARY_OUTLET];
+    console.log(tree.root, primaryOutlet, primaryOutlet.segments, primaryOutlet.children[PRIMARY_OUTLET], primaryOutlet.children['support'], tree.queryParams, tree.fragment);
   }
 
   ngOnInit() {
@@ -174,6 +184,10 @@ export class AppComponent implements OnInit {
 
   getState(outlet) {
     return outlet.activatedRouteData.state;
+  }
+
+  onLocation() {
+    this._location.go('a');
   }
 }
 

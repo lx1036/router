@@ -76,6 +76,8 @@ class ApplyRedirects {
         map((rootSegmentGroup: UrlSegmentGroup) => this.createUrlTree(
                 rootSegmentGroup, this.urlTree.queryParams, this.urlTree.fragment !)));
     return urlTrees$.pipe(catchError((e: any) => {
+      console.log(e);
+
       if (e instanceof AbsoluteRedirect) {
         // after an absolute redirect we do not apply any more redirects!
         this.allowRedirects = false;
