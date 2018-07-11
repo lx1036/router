@@ -21,10 +21,14 @@ if (environment.production) {
   enableProdMode();
 }
 
-platformBrowserDynamic().bootstrapModule(AppModule)
+const platform = platformBrowserDynamic();
+
+platform.bootstrapModule(AppModule)
   .catch(err => console.log(err));
 
 
+/*platform.bootstrapModule(App2Module)
+.catch(err => console.log(err));*/
 
 /*
 export const platformCore: ((extraProviders?: StaticProvider[]) => PlatformRef) = createPlatformFactory(null, 'core', [

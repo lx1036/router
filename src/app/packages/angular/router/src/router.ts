@@ -633,7 +633,7 @@ export class Router {
 
         urlAndSnapshot$ = redirectsApplied$.pipe(mergeMap((appliedUrl: UrlTree) => {
           /**
-           * 2. Construct router state by current URL, and get RouterStateSnapshot
+           * 2. Construct router state by current URL
            */
           return recognize(
                      this.rootComponentType, this.config, appliedUrl, this.serializeUrl(appliedUrl),

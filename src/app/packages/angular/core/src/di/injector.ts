@@ -14,6 +14,7 @@ import {resolveForwardRef} from './forward_ref';
 import {InjectionToken} from './injection_token';
 import {Inject, Optional, Self, SkipSelf} from './metadata';
 import {ConstructorProvider, ExistingProvider, FactoryProvider, StaticClassProvider, StaticProvider, ValueProvider} from './provider';
+import {computeMsgId} from "@angular/compiler/src/i18n/digest";
 
 export const SOURCE = '__source';
 const _THROW_IF_NOT_FOUND = new Object();
@@ -225,6 +226,8 @@ function multiProviderMixError(token: any) {
 }
 
 function recursivelyProcessProviders(records: Map<any, Record>, provider: StaticProvider) {
+  console.log(provider);
+  
   if (provider) {
     provider = resolveForwardRef(provider);
     if (provider instanceof Array) {
@@ -342,8 +345,12 @@ function resolveToken(
 
 function computeDeps(provider: StaticProvider): DependencyRecord[] {
   let deps: DependencyRecord[] = EMPTY;
+  
+  console.log('1', provider);
   const providerDeps: any[] =
       (provider as ExistingProvider & StaticClassProvider & ConstructorProvider).deps;
+  console.log(providerDeps);
+  
   if (providerDeps && providerDeps.length) {
     deps = [];
     for (let i = 0; i < providerDeps.length; i++) {
