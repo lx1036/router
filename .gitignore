@@ -38,3 +38,5 @@ testem.log
 .DS_Store
 Thumbs.db
 *.js
+src/app/compiler/dist
+src/app/compiler/node_modules

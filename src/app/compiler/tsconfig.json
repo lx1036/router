@@ -1,0 +1,38 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": "../../../",
+    "paths": {
+      "@angular/animations": ["src/app/packages/angular/animations"],
+      "@angular/animations/browser": ["src/app/packages/angular/animations/browser"],
+      "@angular/common": ["src/app/packages/angular/common"],
+      "@angular/core": ["src/app/packages/angular/core"],
+      "@angular/core/testing": ["src/app/packages/angular/core/testing"],
+      "@angular/forms": ["src/app/packages/angular/forms"],
+      "@angular/platform-browser": ["src/app/packages/angular/platform-browser"],
+      "@angular/platform-browser/testing": ["src/app/packages/angular/platform-browser/testing"],
+      "@angular/platform-browser-dynamic": ["src/app/packages/angular/platform-browser-dynamic"],
+      "@angular/platform-browser-dynamic/testing": ["src/app/packages/angular/platform-browser-dynamic/testing"],
+      "@angular/router": ["src/app/packages/angular/router"],
+      "@ngrx/*": ["src/app/packages/ngrx/*"]
+    },
+    "outDir": "./dist/out-tsc",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "es5",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "lib": [
+      "es2017",
+      "dom"
+    ]
+  },
+  "angularCompilerOptions": {
+    "genDir": ".",
+    "debug": true
+  }
+}
