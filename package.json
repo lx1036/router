@@ -8,12 +8,11 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "serve": "mkdir ./node_modules/@angular/core;cp -rf ./node_modules/@angular/forms/package.json ./node_modules/@angular/core;ng serve"
+    "serve": "mkdir ./node_modules/@angular/core;cp -rf ./node_modules/@angular/compiler/package.json ./node_modules/@angular/core;ng serve"
   },
   "private": true,
   "dependencies": {
     "@angular/compiler": "^6.0.3",
-    "@angular/forms": "^6.0.3",
     "@angular/http": "^6.0.3",
     "bootstrap": "^4.1.1",
     "core-js": "^2.5.4",

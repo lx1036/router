@@ -22,4 +22,4 @@ const injector = new StaticInjector([
   {provide: Car, useClass: Car, deps: [Engine, Wheel]},
 ]);
 
-console.log(injector.get(Car));
+// console.log(injector.get(Car));

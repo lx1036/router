@@ -226,8 +226,8 @@ function multiProviderMixError(token: any) {
 }
 
 function recursivelyProcessProviders(records: Map<any, Record>, provider: StaticProvider) {
-  console.log(provider);
-  
+  // console.log(provider);
+
   if (provider) {
     provider = resolveForwardRef(provider);
     if (provider instanceof Array) {
@@ -345,12 +345,12 @@ function resolveToken(
 
 function computeDeps(provider: StaticProvider): DependencyRecord[] {
   let deps: DependencyRecord[] = EMPTY;
-  
-  console.log('1', provider);
+
+  // console.log('1', provider);
   const providerDeps: any[] =
       (provider as ExistingProvider & StaticClassProvider & ConstructorProvider).deps;
-  console.log(providerDeps);
-  
+  // console.log(providerDeps);
+
   if (providerDeps && providerDeps.length) {
     deps = [];
     for (let i = 0; i < providerDeps.length; i++) {

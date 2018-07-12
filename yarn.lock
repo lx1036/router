@@ -123,12 +123,6 @@
   dependencies:
     tslib "^1.9.0"
 
-"@angular/forms@^6.0.3":
-  version "6.0.3"
-  resolved "http://registry.npm.taobao.org/@angular/forms/download/@angular/forms-6.0.3.tgz#57328c9ec0ddf4ae7823ec807315501813c22752"
-  dependencies:
-    tslib "^1.9.0"
-
 "@angular/http@^6.0.3":
   version "6.0.3"
   resolved "http://registry.npm.taobao.org/@angular/http/download/@angular/http-6.0.3.tgz#0fee74a820650700517fbc84185ee9b3bd17ebad"

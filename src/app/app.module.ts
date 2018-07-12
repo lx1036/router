@@ -21,13 +21,14 @@ import { EffectsModule } from '@ngrx/effects';
 import {LoginComponent} from './components/login/login.component';
 import {SignUpComponent} from './components/sign-up/sign-up.component';
 import {LandingComponent} from './components/landing/landing.component';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HTTP_INTERCEPTORS, HttpClientModule} from './packages/angular/common/http';
 import {AuthGuardService, AuthService, ErrorInterceptor, TokenInterceptor} from './services/auth.service';
 import {StatusComponent} from './components/status/status.component';
 import {BrowserAnimationsModule} from './packages/angular/platform-browser/animations';
 import {animate, animateChild, group, query, sequence, stagger, style, transition, trigger} from '@angular/animations';
 import {Location} from '@angular/common';
+import {AddressComp, PersonInfoComp} from './nested-form';
 
 
 @Component({
@@ -124,6 +125,10 @@ export class BComponent {
     
     
     <button (click)="onLocation()">Location</button>
+    
+    
+    <h2>Nested Forms</h2>
+    <nested-form></nested-form>
   `,
   animations: [
     trigger('routerTransition', [
@@ -314,11 +319,15 @@ const routes: Routes = [ // Routes -> Router[setupRouter()]
 
     HomeComponent,
     AboutComponent,
+
+    PersonInfoComp,
+    AddressComp,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     FormsModule,
+    ReactiveFormsModule,
     HttpClientModule,
 
     // RouterModule.forRoot(routes, {enableTracing: false, preloadingStrategy: PreloadAllModules}), // PreLoad lazy load modules
