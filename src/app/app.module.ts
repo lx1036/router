@@ -275,7 +275,7 @@ export class AboutComponent { }
 const routes: Routes = [ // Routes -> Router[setupRouter()]
   {path: '', redirectTo: 'about', pathMatch: 'full'},
   {path: 'home', component: HomeComponent, data: { state: 'home'}, outlet: 'animation' },
-  {path: 'about', component: AboutComponent, data: { state: 'about'}, outlet: 'feature' },
+  {path: 'about', component: AboutComponent, data: { state: 'about'}, /*outlet: 'feature'*/ },
 
   // {path: '', pathMatch: 'full', redirectTo: 'a'},
   {path: 'a', component: AComponent},
@@ -331,7 +331,7 @@ const routes: Routes = [ // Routes -> Router[setupRouter()]
     HttpClientModule,
 
     // RouterModule.forRoot(routes, {enableTracing: false, preloadingStrategy: PreloadAllModules}), // PreLoad lazy load modules
-    RouterModule.forRoot(routes, {enableTracing: false, }), // Routes is built for Router
+    RouterModule.forRoot(routes, {enableTracing: false, /*initialNavigation: 'disabled'*/}), // Routes is built for Router
     // StoreModule.forRoot(stateReducerMap, { metaReducers }),
     // !environment.production ? StoreDevtoolsModule.instrument() : [],
     // StoreRouterConnectingModule.forRoot({stateKey: 'routerState'}),

@@ -9,7 +9,7 @@
 import {Location} from '@angular/common';
 import {Compiler, Injector, NgModuleFactoryLoader, NgModuleRef, Type, isDevMode} from '@angular/core';
 import {BehaviorSubject, Observable, Subject, Subscription, of } from 'rxjs';
-import {concatMap, map, mergeMap} from 'rxjs/operators';
+import {concatMap, map, mergeMap, tap} from 'rxjs/operators';
 
 import {applyRedirects} from './apply_redirects';
 import {LoadedRouterConfig, QueryParamsHandling, Route, Routes, copyConfig, validateConfig} from './config';
@@ -298,6 +298,9 @@ export class Router {
    */
   initialNavigation(): void {
     this.setUpLocationChangeListener();
+    
+    console.log(this.navigationId);
+    
     if (this.navigationId === 0) {
       this.navigateByUrl(this.location.path(true), {replaceUrl: true});
     }
@@ -313,12 +316,13 @@ export class Router {
     if (!this.locationSubscription) {
       this.locationSubscription = <any>this.location.subscribe((change: any) => {
         const rawUrlTree = this.urlSerializer.parse(change['url']);
+        
+        console.log('change', change);
         const source: NavigationTrigger = change['type'] === 'popstate' ? 'popstate' : 'hashchange';
         const state = change.state && change.state.navigationId ?
             {navigationId: change.state.navigationId} :
             null;
-        setTimeout(
-            () => { this.scheduleNavigation(rawUrlTree, source, state, {replaceUrl: true}); }, 0);
+        setTimeout(() => { this.scheduleNavigation(rawUrlTree, source, state, {replaceUrl: true}); }, 0);
       });
     }
   }
@@ -515,6 +519,8 @@ export class Router {
   private processNavigations(): void {
     this.navigations
         .pipe(concatMap((nav: NavigationParams) => {
+          console.log('nav', nav);
+          
           if (nav) {
             this.executeScheduledNavigation(nav);
             // a failed navigation should not stop the router from processing
@@ -531,6 +537,8 @@ export class Router {
       rawUrl: UrlTree, source: NavigationTrigger, state: {navigationId: number}|null,
       extras: NavigationExtras): Promise<boolean> {
     const lastNavigation = this.navigations.value;
+    
+    console.log('lastNavigation', lastNavigation);
 
     // If the user triggers a navigation imperatively (e.g., by using navigateByUrl),
     // and that navigation results in 'replaceState' that leads to the same URL,
@@ -564,6 +572,8 @@ export class Router {
     });
 
     const id = ++this.navigationId;
+    console.log({id, source, state, rawUrl, extras, resolve, reject, promise});
+    
     this.navigations.next({id, source, state, rawUrl, extras, resolve, reject, promise});
 
     // Make sure that the error is propagated even though `processNavigations` catch
@@ -575,9 +585,13 @@ export class Router {
                                       state}: NavigationParams): void {
     const url = this.urlHandlingStrategy.extract(rawUrl);
     const urlTransition = !this.navigated || url.toString() !== this.currentUrlTree.toString();
+    
+    console.log('urlTransition', urlTransition, this.onSameUrlNavigation, this.urlHandlingStrategy.shouldProcessUrl(rawUrl));
 
     if ((this.onSameUrlNavigation === 'reload' ? true : urlTransition) &&
         this.urlHandlingStrategy.shouldProcessUrl(rawUrl)) {
+      
+      console.log(1);
       (this.events as Subject<Event>)
           .next(new NavigationStart(id, this.serializeUrl(url), source, state));
       Promise.resolve()
@@ -609,6 +623,8 @@ export class Router {
   private runNavigate(
       url: UrlTree, rawUrl: UrlTree, skipLocationChange: boolean, replaceUrl: boolean, id: number,
       precreatedState: RouterStateSnapshot|null): Promise<boolean> {
+    console.log('runNavigate', url, rawUrl, replaceUrl, id, precreatedState);
+    
     if (id !== this.navigationId) {
       (this.events as Subject<Event>)
           .next(new NavigationCancel(
@@ -627,11 +643,19 @@ export class Router {
          */
         const moduleInjector = this.ngModule.injector;
 
-        // console.log('config', this.config);
-        const redirectsApplied$ =
-            applyRedirects(moduleInjector, this.configLoader, this.urlSerializer, url, this.config);
+        console.log('redirectsApplied$', moduleInjector, this.configLoader, this.urlSerializer, url, this.config);
+  
+        /**
+         * Returns the `UrlTree` with the redirection applied.
+         * @type {Observable<UrlTree>}
+         */
+        const redirectsApplied$ = applyRedirects(moduleInjector, this.configLoader, this.urlSerializer, url, this.config);
 
-        urlAndSnapshot$ = redirectsApplied$.pipe(mergeMap((appliedUrl: UrlTree) => {
+        urlAndSnapshot$ = redirectsApplied$.pipe(
+          tap(urlTree => {
+            console.log('urlTree', urlTree);
+          }),
+          mergeMap((appliedUrl: UrlTree) => {
           /**
            * 2. Construct router state by current URL
            */

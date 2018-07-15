@@ -8,7 +8,7 @@
 
 import {Injector, NgModuleRef} from '@angular/core';
 import {EmptyError, Observable, Observer, from, of } from 'rxjs';
-import {catchError, concatAll, first, map, mergeMap} from 'rxjs/operators';
+import {catchError, concatAll, first, map, mergeMap, tap} from 'rxjs/operators';
 
 import {LoadedRouterConfig, Route, Routes} from './config';
 import {RouterConfigLoader} from './router_config_loader';
@@ -72,11 +72,18 @@ class ApplyRedirects {
   apply(): Observable<UrlTree> {
     const expanded$ =
         this.expandSegmentGroup(this.ngModule, this.config, this.urlTree.root, PRIMARY_OUTLET);
+    
+    
     const urlTrees$ = expanded$.pipe(
+        tap(rootSegmentGroup => {
+          console.log('rootSegmentGroup', rootSegmentGroup);
+        }),
         map((rootSegmentGroup: UrlSegmentGroup) => this.createUrlTree(
                 rootSegmentGroup, this.urlTree.queryParams, this.urlTree.fragment !)));
+    
+    
     return urlTrees$.pipe(catchError((e: any) => {
-      console.log(e);
+      console.log('urlTrees$', e);
 
       if (e instanceof AbsoluteRedirect) {
         // after an absolute redirect we do not apply any more redirects!
@@ -123,10 +130,13 @@ class ApplyRedirects {
   private expandSegmentGroup(
       ngModule: NgModuleRef<any>, routes: Route[], segmentGroup: UrlSegmentGroup,
       outlet: string): Observable<UrlSegmentGroup> {
+    console.log('segmentGroup', segmentGroup);
+  
     if (segmentGroup.segments.length === 0 && segmentGroup.hasChildren()) {
       return this.expandChildren(ngModule, routes, segmentGroup)
           .pipe(map((children: any) => new UrlSegmentGroup([], children)));
     }
+    
 
     return this.expandSegment(ngModule, segmentGroup, routes, segmentGroup.segments, outlet, true);
   }
@@ -146,8 +156,14 @@ class ApplyRedirects {
       allowRedirects: boolean): Observable<UrlSegmentGroup> {
     return of (...routes).pipe(
         map((r: any) => {
+          console.log('routes', r);
+          /**
+           * 这段代码才是从 routes 中 match 出当前 url 对应的 route.
+           * @type {Observable<UrlSegmentGroup>}
+           */
           const expanded$ = this.expandSegmentAgainstRoute(
               ngModule, segmentGroup, routes, r, segments, outlet, allowRedirects);
+          
           return expanded$.pipe(catchError((e: any) => {
             if (e instanceof NoMatch) {
               // TODO(i): this return type doesn't match the declared Observable<UrlSegmentGroup> -
@@ -157,7 +173,9 @@ class ApplyRedirects {
             throw e;
           }));
         }),
-        concatAll(), first((s: any) => !!s), catchError((e: any, _: any) => {
+        concatAll(),
+        first((s: any) => !!s),
+        catchError((e: any, _: any) => {
           if (e instanceof EmptyError || e.name === 'EmptyError') {
             if (this.noLeftoversInUrl(segmentGroup, segments, outlet)) {
               return of (new UrlSegmentGroup([], {}));
@@ -176,6 +194,7 @@ class ApplyRedirects {
   private expandSegmentAgainstRoute(
       ngModule: NgModuleRef<any>, segmentGroup: UrlSegmentGroup, routes: Route[], route: Route,
       paths: UrlSegment[], outlet: string, allowRedirects: boolean): Observable<UrlSegmentGroup> {
+    console.log('outlet', outlet, getOutlet(route), route.redirectTo);
     if (getOutlet(route) !== outlet) {
       return noMatch(segmentGroup);
     }
@@ -217,10 +236,23 @@ class ApplyRedirects {
       return this.expandSegment(ngModule, group, routes, newSegments, outlet, false);
     }));
   }
-
+  
+  /**
+   * 这段代码才是从 routes 中 match 出当前 url 对应的 route.
+   * @param {NgModuleRef<any>} ngModule
+   * @param {UrlSegmentGroup} segmentGroup
+   * @param {Route[]} routes
+   * @param {Route} route
+   * @param {UrlSegment[]} segments
+   * @param {string} outlet
+   * @returns {Observable<UrlSegmentGroup>}
+   */
   private expandRegularSegmentAgainstRouteUsingRedirect(
       ngModule: NgModuleRef<any>, segmentGroup: UrlSegmentGroup, routes: Route[], route: Route,
       segments: UrlSegment[], outlet: string): Observable<UrlSegmentGroup> {
+    /**
+     * 这段代码才是从 routes 中 match 出当前 url 对应的 route.
+     */
     const {matched, consumedSegments, lastChild, positionalParamSegments} =
         match(segmentGroup, route, segments);
     if (!matched) return noMatch(segmentGroup);
@@ -265,6 +297,8 @@ class ApplyRedirects {
 
       const {segmentGroup, slicedSegments} =
           split(rawSegmentGroup, consumedSegments, rawSlicedSegments, childConfig);
+      
+      console.log('slicedSegments', slicedSegments);
 
       if (slicedSegments.length === 0 && segmentGroup.hasChildren()) {
         const expanded$ = this.expandChildren(childModule, childConfig, segmentGroup);

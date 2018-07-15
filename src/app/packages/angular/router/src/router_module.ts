@@ -372,11 +372,15 @@ export class RouterInitializer {
       const res = new Promise(r => resolve = r);
       const router = this.injector.get(Router);
       const opts = this.injector.get(ROUTER_CONFIGURATION);
+      
+      console.log(opts);
 
       if (this.isLegacyDisabled(opts) || this.isLegacyEnabled(opts)) {
         resolve(true);
 
       } else if (opts.initialNavigation === 'disabled') {
+        console.log(opts.initialNavigation);
+        
         router.setUpLocationChangeListener();
         resolve(true);
 
@@ -404,6 +408,8 @@ export class RouterInitializer {
   }
 
   bootstrapListener(bootstrappedComponentRef: ComponentRef<any>): void {
+    console.log('bootstrappedComponentRef', bootstrappedComponentRef);
+    
     const opts = this.injector.get(ROUTER_CONFIGURATION);
     const preloader = this.injector.get(RouterPreloader);
     const router = this.injector.get(Router);
@@ -414,12 +420,16 @@ export class RouterInitializer {
     }
 
     if (this.isLegacyEnabled(opts)) {
+      console.log(opts);
+  
       router.initialNavigation();
     } else if (this.isLegacyDisabled(opts)) {
       router.setUpLocationChangeListener();
     }
 
     preloader.setUpPreloading();
+    
+    console.log(ref.componentTypes[0]);
     router.resetRootComponentType(ref.componentTypes[0]);
     this.resultOfPreactivationDone.next(null !);
     this.resultOfPreactivationDone.complete();
