@@ -17,6 +17,7 @@ import {stringify} from '../util';
 import {createChangeDetectorRef, createInjector, createRendererV1} from './refs';
 import {BindingDef, BindingFlags, DepDef, DepFlags, NodeDef, NodeFlags, OutputDef, OutputType, ProviderData, QueryValueType, Services, ViewData, ViewFlags, ViewState, asElementData, asProviderData, shouldCallLifecycleInitHook} from './types';
 import {calcBindingFlags, checkBinding, dispatchEvent, isComponentView, splitDepsDsl, splitMatchedQueriesDsl, tokenKey, viewParentEl} from './util';
+import {NgModel} from '@angular/forms';
 
 const RendererV1TokenKey = tokenKey(RendererV1);
 const Renderer2TokenKey = tokenKey(Renderer2);
@@ -275,6 +276,8 @@ function createClass(
       for (let i = 0; i < len; i++) {
         depValues[i] = resolveDep(view, elDef, allowPrivateServices, deps[i]);
       }
+
+      // console.log(...depValues);
       return new ctor(...depValues);
   }
 }

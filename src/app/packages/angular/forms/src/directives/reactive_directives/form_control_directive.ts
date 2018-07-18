@@ -176,12 +176,16 @@ export class FormControlDirective extends NgControl implements OnChanges {
               valueAccessors: ControlValueAccessor[],
               @Optional() @Inject(NG_MODEL_WITH_FORM_CONTROL_WARNING) private _ngModelWarningConfig: string|null) {
                 super();
+                console.log('valueAccessors', valueAccessors);
+
                 this._rawValidators = validators || [];
                 this._rawAsyncValidators = asyncValidators || [];
                 this.valueAccessor = selectValueAccessor(this, valueAccessors);
               }
 
               ngOnChanges(changes: SimpleChanges): void {
+                console.log('changes', changes);
+
                 if (this._isControlChanged(changes)) {
                   setUpControl(this.form, this);
                   if (this.control.disabled && this.valueAccessor !.setDisabledState) {

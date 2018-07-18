@@ -159,6 +159,8 @@ export class FormArrayName extends ControlContainer implements OnInit, OnDestroy
       @Optional() @Self() @Inject(NG_VALIDATORS) validators: any[],
       @Optional() @Self() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: any[]) {
     super();
+
+    console.log('parent', parent.constructor.name); // FormGroupDirective
     this._parent = parent;
     this._validators = validators;
     this._asyncValidators = asyncValidators;

@@ -21,7 +21,7 @@ import { EffectsModule } from '@ngrx/effects';
 import {LoginComponent} from './components/login/login.component';
 import {SignUpComponent} from './components/sign-up/sign-up.component';
 import {LandingComponent} from './components/landing/landing.component';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HTTP_INTERCEPTORS, HttpClientModule} from './packages/angular/common/http';
 import {AuthGuardService, AuthService, ErrorInterceptor, TokenInterceptor} from './services/auth.service';
 import {StatusComponent} from './components/status/status.component';
@@ -126,6 +126,11 @@ export class BComponent {
     
     <button (click)="onLocation()">Location</button>
     
+    <form [formGroup]="testGroup" (ngSubmit)="testSubmit($event)">
+      <input type="text" formControlName="test"/>
+      <button type="submit">submit</button>
+    </form>
+    
     
     <h2>Nested Forms</h2>
     <nested-form></nested-form>
@@ -156,6 +161,8 @@ export class BComponent {
   ]
 })
 export class AppComponent implements OnInit {
+  testGroup: FormGroup;
+
   constructor(private _loader: NgModuleFactoryLoader, private _injector: Injector, private _location: Location, private _router: Router) {
     // console.log('NgModuleFactoryLoader', _loader.constructor.name, _injector.get(NgModuleFactoryLoader));
 
@@ -166,7 +173,12 @@ export class AppComponent implements OnInit {
     console.log(tree.root, primaryOutlet, primaryOutlet.segments, primaryOutlet.children[PRIMARY_OUTLET], primaryOutlet.children['support'], tree.queryParams, tree.fragment);
   }
 
+  testSubmit($event) {
+    console.log($event);
+  }
+
   ngOnInit() {
+    this.testGroup = new FormGroup({name: new FormControl('test')});
     /*this.loader.load('./lazy.module#LazyModule').then((ngModuleFactory: NgModuleFactory<any>) => {
       const moduleRef = ngModuleFactory.create(this._injector);
 
@@ -304,34 +316,85 @@ const routes: Routes = [ // Routes -> Router[setupRouter()]
   // {path: '**', redirectTo: '/'}
 ];
 
+@Component({
+  selector: 'form-comp',
+  template: `
+    <form (ngSubmit)="submit(myForm.value)" #myForm="ngForm">
+      <input name="people" type="number" [ngModel]="person" [ngModelOptions]="{name: 'age'}" (ngModelChange)="changePerson($event)"/>
+      <!--<input type="number" [formControl]="control" name="age"/>-->
+      <!--<div [formGroup]="personGroup">-->
+        <!--<input type="number" [formControlName]="'height'">-->
+      <!--</div>-->
+      <!--<p>{{person}}</p>-->
+      <!--<p>{{control.value}}</p>-->
+      <button (click)="person = person + 1;">+</button>
+      <button type="submit">submit</button>
+    </form>
+  `
+})
+export class FormComp implements OnInit {
+  /**
+   * 1. FormControl 的 value 为 12, 如何 write input DOM element 的 value 为 12
+   * @type {number}
+   */
+  person: any = 12;
+
+  control: FormControl;
+  personGroup: FormGroup;
+
+  constructor() {}
+
+  ngOnInit() {
+    this.control = new FormControl(18);
+
+    this.personGroup = new FormGroup({
+      'height': new FormControl(177),
+    });
+  }
+
+  testSubmit($event) {
+    console.log($event);
+  }
+
+  submit(formValue) {
+    console.log(formValue);
+  }
+
+  changePerson(value) {
+    this.person = value;
+  }
+}
+
 @NgModule({
   declarations: [
-    AppComponent,
-    AComponent,
-    BComponent,
+    // AppComponent,
+    // AComponent,
+    // BComponent,
+    //
+    // LoginComponent,
+    // SignUpComponent,
+    // LandingComponent,
+    // StatusComponent,
+    // EComponent,
+    // FComponent,
+    //
+    // HomeComponent,
+    // AboutComponent,
+    //
+    // PersonInfoComp,
+    // AddressComp,
 
-    LoginComponent,
-    SignUpComponent,
-    LandingComponent,
-    StatusComponent,
-    EComponent,
-    FComponent,
-
-    HomeComponent,
-    AboutComponent,
-
-    PersonInfoComp,
-    AddressComp,
+    FormComp,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     FormsModule,
-    ReactiveFormsModule,
+    // ReactiveFormsModule,
     HttpClientModule,
 
     // RouterModule.forRoot(routes, {enableTracing: false, preloadingStrategy: PreloadAllModules}), // PreLoad lazy load modules
-    RouterModule.forRoot(routes, {enableTracing: false, /*initialNavigation: 'disabled'*/}), // Routes is built for Router
+    // RouterModule.forRoot(routes, {enableTracing: false, /*initialNavigation: 'disabled'*/}), // Routes is built for Router
     // StoreModule.forRoot(stateReducerMap, { metaReducers }),
     // !environment.production ? StoreDevtoolsModule.instrument() : [],
     // StoreRouterConnectingModule.forRoot({stateKey: 'routerState'}),
@@ -351,6 +414,6 @@ const routes: Routes = [ // Routes -> Router[setupRouter()]
     },
     AuthGuardService
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [FormComp]
 })
 export class AppModule { }

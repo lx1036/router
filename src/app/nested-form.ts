@@ -34,7 +34,7 @@ export class AddressComp {
           <div class="margin-20">
             <h4>Add customer</h4>
           </div>
-          <form [formGroup]="myForm" novalidate (ngSubmit)="save(myForm)">
+          <form [formGroup]="myForm" novalidate (ngSubmit)="save($event)">
             <div class="form-group">
               <label>Name</label>
               <input type="text" class="form-control" formControlName="name">
@@ -70,6 +70,10 @@ export class AddressComp {
               <pre>form value: <br>{{myForm.value | json}}</pre>
             </div>
           </form>
+          <form [formGroup]="form2" (ngSubmit)="submit($event)" (submit)="rawSubmit($event)">
+            <input type="text" formControlName="name"/>
+            <button type="submit" (click)="buttonSubmit($event)" class="btn btn-primary pull-right">Submit</button>
+          </form>
         </div>
       </div>
     </div>
@@ -77,15 +81,32 @@ export class AddressComp {
 })
 export class PersonInfoComp implements OnInit {
   myForm: FormGroup;
+  form2: FormGroup;
 
   addressesArray: FormArray;
 
   constructor(private _fb: FormBuilder) {}
 
+  submit($event) {
+    console.log('submit', $event);
+  }
+
+  rawSubmit($event) {
+    console.log('rawSubmit', $event);
+  }
+
+  buttonSubmit($event) {
+    console.log('buttonSubmit', $event);
+  }
+
   ngOnInit(): void {
     this.myForm = this._fb.group({
       name: [''],
       addresses: this._fb.array([])
+    });
+
+    this.form2 = this._fb.group({
+      name: ['']
     });
 
     this.addressesArray = <FormArray>this.myForm.controls['addresses'];
@@ -110,7 +131,7 @@ export class PersonInfoComp implements OnInit {
     control.removeAt(index);
   }
 
-  save(form: FormGroup) {
-    console.log(form.value);
+  save($event) {
+    console.log($event);
   }
 }

@@ -8,7 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "serve": "mkdir ./node_modules/@angular/core;cp -rf ./node_modules/@angular/compiler/package.json ./node_modules/@angular/core;ng serve"
+    "serve": "mkdir ./node_modules/@angular/core;cp -rf ./node_modules/@angular/compiler/package.json ./node_modules/@angular/core;ng serve --hmr"
   },
   "private": true,
   "dependencies": {

@@ -133,6 +133,8 @@ export class FormGroupDirective extends ControlContainer implements Form,
   }
 
   onSubmit($event: Event): boolean {
+    // console.log($event);
+
     (this as{submitted: boolean}).submitted = true;
     syncPendingControls(this.form, this.directives);
     this.ngSubmit.emit($event);

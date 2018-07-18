@@ -20,6 +20,8 @@ import {NgModelGroup} from './ng_model_group';
 import {composeAsyncValidators, composeValidators, controlPath, isPropertyUpdated, selectValueAccessor, setUpControl} from './shared';
 import {TemplateDrivenErrors} from './template_driven_errors';
 import {AsyncValidator, AsyncValidatorFn, Validator, ValidatorFn} from './validators';
+import {NumberValueAccessor} from './number_value_accessor';
+import {DefaultValueAccessor} from './default_value_accessor';
 
 export const formControlBinding: any = {
   provide: NgControl,
@@ -163,21 +165,33 @@ export class NgModel extends NgControl implements OnChanges,
   constructor(@Optional() @Host() parent: ControlContainer,
               @Optional() @Self() @Inject(NG_VALIDATORS) validators: Array<Validator|ValidatorFn>,
               @Optional() @Self() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<AsyncValidator|AsyncValidatorFn>,
-              @Optional() @Self() @Inject(NG_VALUE_ACCESSOR)
-              valueAccessors: ControlValueAccessor[]) {
+              @Optional() @Self() @Inject(NG_VALUE_ACCESSOR) valueAccessors: ControlValueAccessor[]) {
                 super();
+
+                // console.trace();
+
+                // console.log('ControlValueAccessor:', valueAccessors); // NumberValueAccessor/DefaultValueAccessor
+
                 this._parent = parent;
+                // console.log('parent', parent.constructor.name);
+
                 this._rawValidators = validators || [];
                 this._rawAsyncValidators = asyncValidators || [];
                 this.valueAccessor = selectValueAccessor(this, valueAccessors);
               }
 
               ngOnChanges(changes: SimpleChanges) {
+
                 this._checkForErrors();
+                /**
+                 * _setUpControl 就是把 ngModel 绑定的 control 注册到父 control 上
+                 */
                 if (!this._registered) this._setUpControl();
                 if ('isDisabled' in changes) {
                   this._updateDisabled(changes);
                 }
+
+                console.log(changes, this.viewModel, this.model);
 
                 if (isPropertyUpdated(changes, this.viewModel)) {
                   this._updateValue(this.model);
