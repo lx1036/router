@@ -194,6 +194,7 @@ export class NgModel extends NgControl implements OnChanges,
                 console.log(changes, this.viewModel, this.model);
 
                 if (isPropertyUpdated(changes, this.viewModel)) {
+                  console.log('viewModel', this.viewModel);
                   this._updateValue(this.model);
                   this.viewModel = this.model;
                 }
@@ -236,6 +237,18 @@ export class NgModel extends NgControl implements OnChanges,
               }
 
               private _setUpStandalone(): void {
+                /**
+                 * ngModel 单独使用时，通过 ControlValueAccessor 来绑定一个 FormControl 对象和一个 DOM 元素
+                 * ControlValueAccessor.writeValue(FormControl.value)
+                 * setUpViewChangePipeline(FormControl, NgControl)
+                 * setUpModelChangePipeline(FormControl, NgControl)
+                 * setUpBlurPipeline(FormControl, NgControl)
+                 */
+                /**
+                 * Template-Driven-Directives 就是个绑定 FormControl 对象和 DOM 元素的场所，
+                 * 绑定的意思是：FormControl 对象的 value 变化，DOM 元素的 value 同步变化[setUpModelChangePipeline()]；
+                 * DOM 元素的值变化，FormControl 对象的 value 同步变化[setUpViewChangePipeline()]
+                 */
                 setUpControl(this.control, this);
                 this.control.updateValueAndValidity({emitEvent: false});
               }

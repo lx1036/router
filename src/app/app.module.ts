@@ -319,18 +319,29 @@ const routes: Routes = [ // Routes -> Router[setupRouter()]
 @Component({
   selector: 'form-comp',
   template: `
-    <form (ngSubmit)="submit(myForm.value)" #myForm="ngForm">
-      <input name="people" type="number" [ngModel]="person" [ngModelOptions]="{name: 'age'}" (ngModelChange)="changePerson($event)"/>
-      <!--<input type="number" [formControl]="control" name="age"/>-->
-      <!--<div [formGroup]="personGroup">-->
-        <!--<input type="number" [formControlName]="'height'">-->
-      <!--</div>-->
-      <!--<p>{{person}}</p>-->
-      <!--<p>{{control.value}}</p>-->
-      <button (click)="person = person + 1;">+</button>
-      <button type="submit">submit</button>
-    </form>
-  `
+    <!--<form (ngSubmit)="submit(myForm.value)" #myForm="ngForm">-->
+      <!--<input name="people" type="number" [ngModel]="person" [ngModelOptions]="{name: 'age'}" (ngModelChange)="changePerson($event)"/>-->
+      <!--&lt;!&ndash;<input type="number" [formControl]="control" name="age"/>&ndash;&gt;-->
+      <!--&lt;!&ndash;<div [formGroup]="personGroup">&ndash;&gt;-->
+        <!--&lt;!&ndash;<input type="number" [formControlName]="'height'">&ndash;&gt;-->
+      <!--&lt;!&ndash;</div>&ndash;&gt;-->
+      <!--&lt;!&ndash;<p>{{person}}</p>&ndash;&gt;-->
+      <!--&lt;!&ndash;<p>{{control.value}}</p>&ndash;&gt;-->
+      <!--<button (click)="person = person + 1;">+</button>-->
+      <!--<button type="submit">submit</button>-->
+    <!--</form>-->
+    
+    <input type="number" [ngModel]="phone" (ngModelChange)="this.phone = $event;" required/>
+    <p>{{phone}}</p>
+    <button (click)="add()">+</button>
+  `,
+  styles: [
+    `
+        .ng-invalid {
+            border: 2px solid red;
+        }
+    `
+  ]
 })
 export class FormComp implements OnInit {
   /**
@@ -341,6 +352,8 @@ export class FormComp implements OnInit {
 
   control: FormControl;
   personGroup: FormGroup;
+  
+  phone = 1;
 
   constructor() {}
 
@@ -362,6 +375,10 @@ export class FormComp implements OnInit {
 
   changePerson(value) {
     this.person = value;
+  }
+  
+  add() {
+    this.phone++;
   }
 }
 
