@@ -6,7 +6,16 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {Directive, Input, OnChanges, SimpleChanges, StaticProvider, forwardRef} from '@angular/core';
+import {
+  Directive,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  StaticProvider,
+  forwardRef,
+  InjectionToken,
+  Inject, Self, Optional
+} from '@angular/core';
 import {Observable} from 'rxjs';
 
 import {AbstractControl} from '../model';
@@ -81,6 +90,10 @@ export const CHECKBOX_REQUIRED_VALIDATOR: StaticProvider = {
 export class RequiredValidator implements Validator {
   private _required: boolean;
   private _onChange: () => void;
+  
+  constructor() {
+    console.log(RequiredValidator.name);
+  }
 
   @Input()
   get required(): boolean|string { return this._required; }
@@ -131,6 +144,9 @@ export const EMAIL_VALIDATOR: any = {
   multi: true
 };
 
+
+const TEST = new InjectionToken<string>('Test Directive Instance Order');
+
 /**
  * A Directive that adds the `email` validator to controls marked with the
  * `email` attribute, via the `NG_VALIDATORS` binding.
@@ -147,15 +163,22 @@ export const EMAIL_VALIDATOR: any = {
  */
 @Directive({
   selector: '[email][formControlName],[email][formControl],[email][ngModel]',
-  providers: [EMAIL_VALIDATOR]
+  providers: [EMAIL_VALIDATOR, {provide: TEST, useValue: 'test'}]
 })
 export class EmailValidator implements Validator {
   private _enabled: boolean;
   private _onChange: () => void;
+  
+  constructor(/*@Optional()@Self()@Inject(NG_VALIDATORS) private validators: Array<Validator|ValidatorFn>*/) {
+    console.log(EmailValidator.name);
+  }
 
   @Input()
   set email(value: boolean|string) {
     this._enabled = value === '' || value === true || value === 'true';
+    
+    // Component's and directive's initialization occur in declaration order.
+    console.log('_onChange', this._onChange);
     if (this._onChange) this._onChange();
   }
 

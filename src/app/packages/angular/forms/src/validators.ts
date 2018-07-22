@@ -204,6 +204,8 @@ export class Validators {
     if (presentValidators.length == 0) return null;
 
     return function(control: AbstractControl) {
+      console.log('presentValidators', presentValidators);
+      
       return _mergeErrors(_executeValidators(control, presentValidators));
     };
   }
@@ -233,7 +235,7 @@ export function toObservable(r: any): Observable<any> {
 }
 
 function _executeValidators(control: AbstractControl, validators: ValidatorFn[]): any[] {
-  return validators.map(v => v(control));
+  return validators.map(v => {console.log('v', v);v(control);});
 }
 
 function _executeAsyncValidators(control: AbstractControl, validators: AsyncValidatorFn[]): any[] {
@@ -241,9 +243,13 @@ function _executeAsyncValidators(control: AbstractControl, validators: AsyncVali
 }
 
 function _mergeErrors(arrayOfErrors: ValidationErrors[]): ValidationErrors|null {
+  console.log('arrayOfErrors', arrayOfErrors);
+  
   const res: {[key: string]: any} =
       arrayOfErrors.reduce((res: ValidationErrors | null, errors: ValidationErrors | null) => {
         return errors != null ? {...res !, ...errors} : res !;
       }, {});
+  
+  
   return Object.keys(res).length === 0 ? null : res;
 }

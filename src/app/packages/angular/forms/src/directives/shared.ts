@@ -8,7 +8,7 @@
 
 import {isDevMode, ɵlooseIdentical as looseIdentical} from '@angular/core';
 
-import {FormArray, FormControl, FormGroup} from '../model';
+import {AbstractControl, FormArray, FormControl, FormGroup} from '../model';
 import {Validators} from '../validators';
 import {AbstractControlDirective} from './abstract_control_directive';
 import {AbstractFormGroupDirective} from './abstract_form_group_directive';
@@ -35,7 +35,12 @@ export function controlPath(name: string, parent: ControlContainer): string[] {
 export function setUpControl(control: FormControl, dir: NgControl): void {
   if (!control) _throwError(dir, 'Cannot find control with');
   if (!dir.valueAccessor) _throwError(dir, 'No value accessor for form control with');
-
+  
+  /**
+   * ValidatorFn
+   * dir.validator: (AbstractControl) => {return _mergeErrors(_executeValidators(control, presentValidators));}
+   */
+  // console.log('control.validator', control.validator!, dir.validator);
   control.validator = Validators.compose([control.validator !, dir.validator]);
   control.asyncValidator = Validators.composeAsync([control.asyncValidator !, dir.asyncValidator]);
 
@@ -54,6 +59,8 @@ export function setUpControl(control: FormControl, dir: NgControl): void {
 
   // re-run validation when validator binding changes, e.g. minlength=3 -> minlength=4
   dir._rawValidators.forEach((validator: Validator | ValidatorFn) => {
+    console.log('validator', validator.constructor);
+    
     if ((<Validator>validator).registerOnValidatorChange)
       (<Validator>validator).registerOnValidatorChange !(() => control.updateValueAndValidity());
   });

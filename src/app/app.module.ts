@@ -1,5 +1,14 @@
 import { BrowserModule } from '@angular/platform-browser';
-import {Component, ComponentRef, Injector, NgModule, NgModuleFactory, NgModuleFactoryLoader, OnInit} from '@angular/core';
+import {
+  Component,
+  ComponentRef,
+  Directive, forwardRef,
+  Injector, Input,
+  NgModule,
+  NgModuleFactory,
+  NgModuleFactoryLoader,
+  OnInit, SimpleChanges, StaticProvider
+} from '@angular/core';
 
 import {
   ActivatedRoute, ActivatedRouteSnapshot,
@@ -21,7 +30,17 @@ import { EffectsModule } from '@ngrx/effects';
 import {LoginComponent} from './components/login/login.component';
 import {SignUpComponent} from './components/sign-up/sign-up.component';
 import {LandingComponent} from './components/landing/landing.component';
-import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  FormsModule, NG_VALIDATORS,
+  ReactiveFormsModule, ValidationErrors,
+  Validator,
+  Validators as FormValidators,
+  ValidatorFn,
+} from '@angular/forms';
 import {HTTP_INTERCEPTORS, HttpClientModule} from './packages/angular/common/http';
 import {AuthGuardService, AuthService, ErrorInterceptor, TokenInterceptor} from './services/auth.service';
 import {StatusComponent} from './components/status/status.component';
@@ -316,6 +335,72 @@ const routes: Routes = [ // Routes -> Router[setupRouter()]
   // {path: '**', redirectTo: '/'}
 ];
 
+
+@Directive({
+  selector: '[priority-1]'
+})
+export class Priority1 {
+  constructor() {
+    console.log('priority-1');
+  }
+}
+
+@Directive({
+  selector: '[priority-2]'
+})
+export class Priority2 {
+  constructor() {
+    console.log('priority-2');
+  }
+}
+
+
+export class Validators extends FormValidators {
+  static forbidden(forbidden: string): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      return (new RegExp(forbidden)).test(control.value) ? {forbidden: true} : null;
+    }
+  }
+}
+
+
+export const FORBIDDEN_VALIDATOR: StaticProvider = {
+  provide: NG_VALIDATORS,
+  useExisting: forwardRef(() => ForbiddenValidator),
+  multi: true
+};
+
+@Directive({
+  selector:
+    ':not([type=checkbox])[forbidden][formControlName],:not([type=checkbox])[forbidden][formControl],:not([type=checkbox])[forbidden][ngModel]',
+  providers: [FORBIDDEN_VALIDATOR],
+})
+export class ForbiddenValidator implements Validator{
+  private _onChange: () => void;
+  private _validator: ValidatorFn;
+  
+  @Input() forbidden: string;
+  
+  ngOnChanges(changes: SimpleChanges) {
+    if ('forbidden' in changes) {
+      this._createValidator();
+      if (this._onChange) this._onChange();
+    }
+  }
+  
+  registerOnValidatorChange(fn: () => void): void {
+    this._onChange = fn;
+  }
+  
+  validate(c: AbstractControl): ValidationErrors | null {
+    return this.forbidden ? this._validator(c) : null;
+  }
+  
+  private _createValidator(): void {
+    this._validator = Validators.forbidden(this.forbidden);
+  }
+}
+
 @Component({
   selector: 'form-comp',
   template: `
@@ -331,9 +416,11 @@ const routes: Routes = [ // Routes -> Router[setupRouter()]
       <!--<button type="submit">submit</button>-->
     <!--</form>-->
     
-    <input type="number" [ngModel]="phone" (ngModelChange)="this.phone = $event;" required/>
-    <p>{{phone}}</p>
-    <button (click)="add()">+</button>
+    <!--<input type="number" [ngModel]="phone" (ngModelChange)="this.phone = $event;" required/>-->
+    <!--<p>{{phone}}</p>-->
+    <!--<button (click)="add()">+</button>-->
+
+    <input type="email" name="email" ngModel email required>
   `,
   styles: [
     `
@@ -402,6 +489,9 @@ export class FormComp implements OnInit {
     // AddressComp,
 
     FormComp,
+    Priority2,
+    Priority1,
+    ForbiddenValidator,
   ],
   imports: [
     BrowserModule,

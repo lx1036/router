@@ -57,15 +57,19 @@ export const SHARED_FORM_DIRECTIVES: Type<any>[] = [
   RadioControlValueAccessor,
   NgControlStatus,
   NgControlStatusGroup,
-  RequiredValidator,
+  // RequiredValidator,
   MinLengthValidator,
   MaxLengthValidator,
   PatternValidator,
   CheckboxRequiredValidator,
   EmailValidator,
+  NgModel,
+  
+  RequiredValidator,
+
 ];
 
-export const TEMPLATE_DRIVEN_DIRECTIVES: Type<any>[] = [NgModel, NgModelGroup, NgForm];
+export const TEMPLATE_DRIVEN_DIRECTIVES: Type<any>[] = [NgModelGroup, NgForm];
 
 export const REACTIVE_DRIVEN_DIRECTIVES: Type<any>[] =
     [FormControlDirective, FormGroupDirective, FormControlName, FormGroupName, FormArrayName];

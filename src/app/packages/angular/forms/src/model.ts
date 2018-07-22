@@ -481,6 +481,8 @@ export abstract class AbstractControl {
   }
 
   private _runValidator(): ValidationErrors|null {
+    console.log('validator', this.validator);
+    
     return this.validator ? this.validator(this) : null;
   }
 
@@ -784,6 +786,8 @@ export class FormControl extends AbstractControl {
     emitViewToModelChange?: boolean
   } = {}): void {
     (this as{value: any}).value = this._pendingValue = value;
+    
+    console.log('_onChange', this._onChange);
     if (this._onChange.length && options.emitModelToViewChange !== false) {
       this._onChange.forEach(
           (changeFn) => changeFn(this.value, options.emitViewToModelChange !== false));
