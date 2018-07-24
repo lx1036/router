@@ -149,6 +149,7 @@ export class StaticInjector implements Injector {
         Injector, <Record>{token: Injector, fn: IDENT, deps: EMPTY, value: this, useNew: false});
     records.set(
         INJECTOR, <Record>{token: INJECTOR, fn: IDENT, deps: EMPTY, value: this, useNew: false});
+    // process providers
     recursivelyProcessProviders(records, providers);
   }
 
@@ -243,6 +244,7 @@ function recursivelyProcessProviders(records: Map<any, Record>, provider: Static
       // At this point we have what looks like a provider: {provide: ?, ....}
       let token = resolveForwardRef(provider.provide);
       const resolvedProvider = resolveProvider(provider);
+
       if (provider.multi === true) {
         // This is a multi provider.
         let multiProvider: Record|undefined = records.get(token);
@@ -264,11 +266,12 @@ function recursivelyProcessProviders(records: Map<any, Record>, provider: Static
         token = provider;
         multiProvider.deps.push({token, options: OptionFlags.Default});
       }
+
       const record = records.get(token);
       if (record && record.fn == MULTI_PROVIDER_FN) {
         throw multiProviderMixError(token);
       }
-      records.set(token, resolvedProvider);
+      records.set(token, resolvedProvider); // resolvedProvider: Record
     } else {
       throw staticError('Unexpected provider', provider);
     }
@@ -346,10 +349,8 @@ function resolveToken(
 function computeDeps(provider: StaticProvider): DependencyRecord[] {
   let deps: DependencyRecord[] = EMPTY;
 
-  // console.log('1', provider);
   const providerDeps: any[] =
       (provider as ExistingProvider & StaticClassProvider & ConstructorProvider).deps;
-  // console.log(providerDeps);
 
   if (providerDeps && providerDeps.length) {
     deps = [];

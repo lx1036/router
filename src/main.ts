@@ -1,4 +1,4 @@
-import {COMPILER_OPTIONS, CompilerFactory, createPlatformFactory, enableProdMode, PLATFORM_INITIALIZER} from '@angular/core';
+import {COMPILER_OPTIONS, CompilerFactory, createPlatformFactory, enableProdMode, NgModuleRef, PLATFORM_INITIALIZER} from '@angular/core';
 
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
@@ -9,28 +9,30 @@ import {Injector, StaticProvider} from './app/packages/angular/core/src/di';
 import {PLATFORM_ID} from './app/packages/angular/core/src/application_tokens';
 import {ResourceLoader} from '@angular/compiler';
 import {ResourceLoaderImpl} from './app/packages/angular/platform-browser-dynamic/src/resource_loader/resource_loader_impl';
-import {ɵINTERNAL_BROWSER_PLATFORM_PROVIDERS as INTERNAL_BROWSER_PLATFORM_PROVIDERS} from '@angular/platform-browser';
+import {platformBrowser, ɵINTERNAL_BROWSER_PLATFORM_PROVIDERS as INTERNAL_BROWSER_PLATFORM_PROVIDERS} from '@angular/platform-browser';
 import {PlatformLocation, ɵPLATFORM_BROWSER_ID as PLATFORM_BROWSER_ID} from '@angular/common';
 import {JitCompilerFactory} from './app/packages/angular/platform-browser-dynamic/src/compiler_factory';
 import {BrowserPlatformLocation} from './app/packages/angular/platform-browser/src/browser/location/browser_platform_location';
 import {_document, initDomAdapter} from './app/packages/angular/platform-browser/src/browser';
 import {DOCUMENT} from './app/packages/angular/platform-browser/src/dom/dom_tokens';
-import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
+// import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 
 if (environment.production) {
   enableProdMode();
 }
 
-const platform = platformBrowserDynamic();
-
-platform.bootstrapModule(AppModule)
-  .catch(err => console.log(err));
+// const platform = platformBrowserDynamic();
+//
+// platform.bootstrapModule(AppModule)
+//   .catch(err => console.log(err));
 
 
 /*platform.bootstrapModule(App2Module)
 .catch(err => console.log(err));*/
-
-/*
+/**
+ * https://blog.kevinyang.net/2017/09/24/angular-injector/
+ * https://blog.angularindepth.com/angular-dependency-injection-and-tree-shakeable-tokens-4588a8f70d5d
+ */
 export const platformCore: ((extraProviders?: StaticProvider[]) => PlatformRef) = createPlatformFactory(null, 'core', [
   // Set a default platform name for platforms that don't set it explicitly.
   {provide: PLATFORM_ID, useValue: 'unknown'},
@@ -45,7 +47,7 @@ export const platformCoreDynamic: ((extraProviders?: StaticProvider[]) => Platfo
 ]);
 
 
-const platformBrowserDynamicTest =createPlatformFactory(platformCoreDynamic, 'browserDynamic', [
+const platformBrowserDynamic: ((extraProviders?: StaticProvider[]) => PlatformRef) = createPlatformFactory(platformCoreDynamic, 'browserDynamic', [
   [
     {provide: PLATFORM_ID, useValue: PLATFORM_BROWSER_ID},
     {provide: PLATFORM_INITIALIZER, useValue: initDomAdapter, multi: true},
@@ -60,7 +62,9 @@ const platformBrowserDynamicTest =createPlatformFactory(platformCoreDynamic, 'br
   {provide: PLATFORM_ID, useValue: PLATFORM_BROWSER_ID},
 ]);
 
-const platformRef: PlatformRef = platformBrowserDynamicTest();
+const platformRef: PlatformRef = platformBrowserDynamic();
 
-console.log(platformRef.injector);*/
+platformRef.bootstrapModule(AppModule).then((appModuleRef: NgModuleRef<AppModule>) => {
+  console.log(appModuleRef.instance);
+});
 

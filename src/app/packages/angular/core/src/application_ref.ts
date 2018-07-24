@@ -84,6 +84,8 @@ export function createPlatform(injector: Injector): PlatformRef {
     throw new Error(
         'There can be only one platform. Destroy the previous one to create a new one.');
   }
+
+  console.log(injector.toString());
   _platform = injector.get(PlatformRef);
   const inits = injector.get(PLATFORM_INITIALIZER, null);
   if (inits) inits.forEach((init: any) => init());
@@ -105,11 +107,15 @@ export function createPlatformFactory(
     let platform = getPlatform();
     if (!platform || platform.injector.get(ALLOW_MULTIPLE_PLATFORMS, false)) {
       if (parentPlatformFactory) {
+        console.log(marker.toString()); // 1. InjectionToken Platform: browserDynamic -> 2. InjectionToken Platform: coreDynamic
+
         parentPlatformFactory(
             providers.concat(extraProviders).concat({provide: marker, useValue: true}));
       } else {
+        console.log(marker.toString()); // 3. InjectionToken Platform: core
         const injectedProviders: StaticProvider[] =
             providers.concat(extraProviders).concat({provide: marker, useValue: true});
+
         createPlatform(Injector.create({providers: injectedProviders, name: desc}));
       }
     }
@@ -217,6 +223,9 @@ export class PlatformRef {
    */
   bootstrapModuleFactory<M>(moduleFactory: NgModuleFactory<M>, options?: BootstrapOptions):
       Promise<NgModuleRef<M>> {
+
+    console.log('moduleFactory', moduleFactory);
+
     // Note: We need to create the NgZone _before_ we instantiate the module,
     // as instantiating the module creates some providers eagerly.
     // So we create a mini parent injector that just contains the new NgZone and
@@ -240,8 +249,11 @@ export class PlatformRef {
               {next: (error: any) => { exceptionHandler.handleError(error); }}));
       return _callAndReportToErrorHandler(exceptionHandler, ngZone !, () => {
         const initStatus: ApplicationInitStatus = moduleRef.injector.get(ApplicationInitStatus);
+        // console.log('moduleRef.injector', moduleRef.injector._parent.toString());
         initStatus.runInitializers();
         return initStatus.donePromise.then(() => {
+          console.log('moduleRef', moduleRef.instance);
+
           this._moduleDoBootstrap(moduleRef);
           return moduleRef;
         });
@@ -470,23 +482,22 @@ export class ApplicationRef {
     if (componentOrFactory instanceof ComponentFactory) {
       componentFactory = componentOrFactory;
     } else {
-      componentFactory =
-          this._componentFactoryResolver.resolveComponentFactory(componentOrFactory) !;
+      componentFactory = this._componentFactoryResolver.resolveComponentFactory(componentOrFactory) !;
     }
+
     this.componentTypes.push(componentFactory.componentType);
 
     // Create a factory associated with the current module if it's not bound to some other
-    const ngModule = componentFactory instanceof ComponentFactoryBoundToModule ?
-        null :
-        this._injector.get(NgModuleRef);
+    const ngModule = componentFactory instanceof ComponentFactoryBoundToModule ? null : this._injector.get(NgModuleRef);
     const selectorOrNode = rootSelectorOrNode || componentFactory.selector;
+    // That’s the place where angular injector tree is bifurcated into parallel trees.
     const compRef = componentFactory.create(Injector.NULL, [], selectorOrNode, ngModule);
 
     compRef.onDestroy(() => { this._unloadComponent(compRef); });
     const testability = compRef.injector.get(Testability, null);
+
     if (testability) {
-      compRef.injector.get(TestabilityRegistry)
-          .registerApplication(compRef.location.nativeElement, testability);
+      compRef.injector.get(TestabilityRegistry).registerApplication(compRef.location.nativeElement, testability);
     }
 
     this._loadComponent(compRef);

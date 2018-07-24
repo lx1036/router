@@ -2,7 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import {
   Component,
   ComponentRef,
-  Directive, forwardRef,
+  Directive, forwardRef, Injectable,
   Injector, Input,
   NgModule,
   NgModuleFactory,
@@ -378,24 +378,24 @@ export const FORBIDDEN_VALIDATOR: StaticProvider = {
 export class ForbiddenValidator implements Validator{
   private _onChange: () => void;
   private _validator: ValidatorFn;
-  
+
   @Input() forbidden: string;
-  
+
   ngOnChanges(changes: SimpleChanges) {
     if ('forbidden' in changes) {
       this._createValidator();
       if (this._onChange) this._onChange();
     }
   }
-  
+
   registerOnValidatorChange(fn: () => void): void {
     this._onChange = fn;
   }
-  
+
   validate(c: AbstractControl): ValidationErrors | null {
     return this.forbidden ? this._validator(c) : null;
   }
-  
+
   private _createValidator(): void {
     this._validator = Validators.forbidden(this.forbidden);
   }
@@ -439,7 +439,7 @@ export class FormComp implements OnInit {
 
   control: FormControl;
   personGroup: FormGroup;
-  
+
   phone = 1;
 
   constructor() {}
@@ -463,7 +463,7 @@ export class FormComp implements OnInit {
   changePerson(value) {
     this.person = value;
   }
-  
+
   add() {
     this.phone++;
   }

@@ -23,3 +23,10 @@ export class MainModule {
     appRef.bootstrap(MyComponent);
   }
 }
+
+
+// Intersection Types(https://www.tslang.cn/docs/handbook/advanced-types.html)
+let option = {providedIn: 'test'};
+type person = {providedIn: string};
+
+let test: person & {useValue: any} = {useValue: 1, providedIn: 'a'};

@@ -1,6 +1,6 @@
-import {Type} from '../packages/angular/core/src/type';
-import {TypeDecorator, ANNOTATIONS} from '../packages/angular/core/src/util/decorators';
-import {DirectiveDecorator} from '../packages/angular/core/src/metadata/directives';
+import {Type} from '../../src/app/packages/angular/core/src/type';
+import {TypeDecorator, ANNOTATIONS} from '../../src/app/packages/angular/core/src/util/decorators';
+import {DirectiveDecorator} from '../../src/app/packages/angular/core/src/metadata/directives';
 
 
 /**
