@@ -15,16 +15,17 @@ import {JitCompilerFactory} from './app/packages/angular/platform-browser-dynami
 import {BrowserPlatformLocation} from './app/packages/angular/platform-browser/src/browser/location/browser_platform_location';
 import {_document, initDomAdapter} from './app/packages/angular/platform-browser/src/browser';
 import {DOCUMENT} from './app/packages/angular/platform-browser/src/dom/dom_tokens';
+import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 // import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 
 if (environment.production) {
   enableProdMode();
 }
 
-// const platform = platformBrowserDynamic();
-//
-// platform.bootstrapModule(AppModule)
-//   .catch(err => console.log(err));
+const platform = platformBrowserDynamic();
+
+platform.bootstrapModule(AppModule)
+  .catch(err => console.log(err));
 
 
 /*platform.bootstrapModule(App2Module)
@@ -33,7 +34,7 @@ if (environment.production) {
  * https://blog.kevinyang.net/2017/09/24/angular-injector/
  * https://blog.angularindepth.com/angular-dependency-injection-and-tree-shakeable-tokens-4588a8f70d5d
  */
-export const platformCore: ((extraProviders?: StaticProvider[]) => PlatformRef) = createPlatformFactory(null, 'core', [
+/*export const platformCore: ((extraProviders?: StaticProvider[]) => PlatformRef) = createPlatformFactory(null, 'core', [
   // Set a default platform name for platforms that don't set it explicitly.
   {provide: PLATFORM_ID, useValue: 'unknown'},
   {provide: PlatformRef, deps: [Injector]},
@@ -66,5 +67,5 @@ const platformRef: PlatformRef = platformBrowserDynamic();
 
 platformRef.bootstrapModule(AppModule).then((appModuleRef: NgModuleRef<AppModule>) => {
   console.log(appModuleRef.instance);
-});
+});*/
 

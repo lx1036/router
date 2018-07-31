@@ -47,7 +47,7 @@ import {StatusComponent} from './components/status/status.component';
 import {BrowserAnimationsModule} from './packages/angular/platform-browser/animations';
 import {animate, animateChild, group, query, sequence, stagger, style, transition, trigger} from '@angular/animations';
 import {Location} from '@angular/common';
-import {AddressComp, PersonInfoComp} from './nested-form';
+import {AddressComp, AddressComponent, PersonInfoComp, PersonNestedForm} from './nested-form';
 
 
 @Component({
@@ -420,7 +420,10 @@ export class ForbiddenValidator implements Validator{
     <!--<p>{{phone}}</p>-->
     <!--<button (click)="add()">+</button>-->
 
-    <input type="email" name="email" ngModel email required>
+    <!--<input type="email" name="email" ngModel email required>-->
+    
+    <person-nested-from></person-nested-from>
+    
   `,
   styles: [
     `
@@ -492,12 +495,15 @@ export class FormComp implements OnInit {
     Priority2,
     Priority1,
     ForbiddenValidator,
+
+    PersonNestedForm,
+    AddressComponent,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     FormsModule,
-    // ReactiveFormsModule,
+    ReactiveFormsModule,
     HttpClientModule,
 
     // RouterModule.forRoot(routes, {enableTracing: false, preloadingStrategy: PreloadAllModules}), // PreLoad lazy load modules

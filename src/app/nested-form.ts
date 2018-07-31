@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {FormArray, FormBuilder, FormGroup, NgForm} from '@angular/forms';
+import {ControlContainer, FormArray, FormBuilder, FormGroup, NgForm} from '@angular/forms';
 
 
 
@@ -135,3 +135,77 @@ export class PersonInfoComp implements OnInit {
     console.log($event);
   }
 }
+
+
+
+@Component({
+  selector: 'person-nested-from',
+  template: `
+    <h2>Complex form with address component</h2>
+    <form #myForm="ngForm">
+      <div>
+        <label>Firstname:</label>
+        <input type="text" name="firstName" ngModel>
+      </div>
+      <div>
+        <label>Lastname:</label>
+        <input type="text" name="lastName" ngModel>
+      </div>
+      <address></address>
+      
+      <!--<div>-->
+        <!--<fieldset ngModelGroup="address">-->
+          <!--<div>-->
+            <!--<label>Zip:</label>-->
+            <!--<input type="text" name="zip" ngModel>-->
+          <!--</div>-->
+          <!--<div>-->
+            <!--<label>Street:</label>-->
+            <!--<input type="text" name="street" ngModel>-->
+          <!--</div>-->
+          <!--<div>-->
+            <!--<label>City:</label>-->
+            <!--<input type="text" name="city" ngModel>-->
+          <!--</div>-->
+        <!--</fieldset>-->
+      <!--</div>-->
+    </form>
+    <pre>{{ myForm.value | json }}</pre>
+  `,
+  viewProviders: [
+    // {provide: ControlContainer, useExisting: NgForm},
+  ],
+  providers: [
+    // {provide: ControlContainer, useExisting: NgForm},
+  ]
+})
+export class PersonNestedForm {
+}
+@Component({
+  selector: 'address',
+  template: `
+    <fieldset ngModelGroup="address">
+      <div>
+        <label>Zip:</label>
+        <input type="text" name="zip" ngModel>
+      </div>
+      <div>
+        <label>Street:</label>
+        <input type="text" name="street" ngModel>
+      </div>
+      <div>
+        <label>City:</label>
+        <input type="text" name="city" ngModel>
+      </div>
+    </fieldset>
+  `,
+  viewProviders: [
+    {provide: ControlContainer, useExisting: NgForm},
+
+  ],
+  providers: [
+    // {provide: ControlContainer, useExisting: NgForm},
+
+  ]
+})
+export class AddressComponent  {}
