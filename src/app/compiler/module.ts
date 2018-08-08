@@ -12,17 +12,71 @@ import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
  */
 
 @Component({
+  selector: 'a-comp',
+  template: `
+    <p>A Comp</p>
+  `
+})
+export class AComp {
+
+}
+
+/**
+ * @link https://juejin.im/post/5b2158b8f265da6dfe09f05d [译] 别再对 Angular Modules 感到迷惑
+ * @link https://juejin.im/post/5b61e925f265da0f48612f23 [译] Angular 的 @Host 装饰器和元素注入器
+ */
+export class AService {
+
+}
+
+@NgModule({
+  providers: [
+    {provide: 'b', useValue: 'c'}
+  ]
+})
+export class BModule {
+
+}
+
+@NgModule({
+  imports: [],
+  declarations: [AComp],
+  providers: [
+    AService,
+    {provide: 'a', useValue: 'a'},
+    {provide: 'b', useValue: 'b'},
+  ],
+  exports: [AComp]
+})
+export class AModule {
+
+}
+
+
+
+@Component({
   selector: 'app',
   template: `
     <p>{{name}}</p>
+    <a-comp></a-comp>
   `
 })
 export class AppComp {
   name = 'lx1036';
 }
 
+export class BService {
+
+}
+
 @NgModule({
-  declarations: [AppComp]
+  imports: [AModule, BModule],
+  declarations: [AppComp],
+  providers: [
+    BService,
+    {provide: 'a', useValue: 'b'}
+  ],
+  bootstrap: [AppComp]
 })
 export class AppModule {
 
