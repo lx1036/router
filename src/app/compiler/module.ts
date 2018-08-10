@@ -1,7 +1,9 @@
-import {Component, NgModule} from '@angular/core';
+
+
+import {Component, Directive, Inject, Input, NgModule, Self} from '../packages/angular/core';
 import "../packages/angular/goog";
 import "hammerjs";
-import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
+import {platformBrowserDynamic} from '../packages/angular/platform-browser-dynamic';
 
 
 /**
@@ -11,14 +13,26 @@ import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
  * yarn ngc -p src/app/compiler/tsconfig.json
  */
 
+@Directive({
+  selector: '[adir]'
+})
+export class ADir {
+
+}
+
 @Component({
   selector: 'a-comp',
   template: `
-    <p>A Comp</p>
+    <p adir>{{app}} {{bpp}}</p>
+    <h1>{{app}}</h1>
   `
 })
 export class AComp {
+  protected name = 'lx1036';
 
+  constructor(@Inject('a') public app: string, @Inject('b') public bpp: string, private aService: AService) {}
+
+  @Self()@Input() protected age: number;
 }
 
 /**
@@ -26,21 +40,11 @@ export class AComp {
  * @link https://juejin.im/post/5b61e925f265da0f48612f23 [译] Angular 的 @Host 装饰器和元素注入器
  */
 export class AService {
-
-}
-
-@NgModule({
-  providers: [
-    {provide: 'b', useValue: 'c'}
-  ]
-})
-export class BModule {
-
 }
 
 @NgModule({
   imports: [],
-  declarations: [AComp],
+  declarations: [AComp, ADir],
   providers: [
     AService,
     {provide: 'a', useValue: 'a'},
@@ -49,10 +53,19 @@ export class BModule {
   exports: [AComp]
 })
 export class AModule {
-
 }
 
+export class BService {
+}
 
+@NgModule({
+  providers: [
+    BService,
+    {provide: 'b', useValue: 'c'}
+  ]
+})
+export class BModule {
+}
 
 @Component({
   selector: 'app',
@@ -65,22 +78,19 @@ export class AppComp {
   name = 'lx1036';
 }
 
-export class BService {
-
+export class AppService {
 }
 
 @NgModule({
   imports: [AModule, BModule],
   declarations: [AppComp],
   providers: [
-    BService,
+    AppService,
     {provide: 'a', useValue: 'b'}
   ],
   bootstrap: [AppComp]
 })
 export class AppModule {
-
 }
-
 
 platformBrowserDynamic().bootstrapModule(AppModule).then(ngModuleRef => console.log(ngModuleRef));

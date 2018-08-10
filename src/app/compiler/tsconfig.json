@@ -6,10 +6,12 @@
       "@angular/animations": ["src/app/packages/angular/animations"],
       "@angular/animations/browser": ["src/app/packages/angular/animations/browser"],
       "@angular/common": ["src/app/packages/angular/common"],
+      "@angular/common/http": ["src/app/packages/angular/common/http"],
       "@angular/core": ["src/app/packages/angular/core"],
       "@angular/core/testing": ["src/app/packages/angular/core/testing"],
       "@angular/forms": ["src/app/packages/angular/forms"],
       "@angular/platform-browser": ["src/app/packages/angular/platform-browser"],
+      "@angular/platform-browser/animations": ["src/app/packages/angular/platform-browser/animations"],
       "@angular/platform-browser/testing": ["src/app/packages/angular/platform-browser/testing"],
       "@angular/platform-browser-dynamic": ["src/app/packages/angular/platform-browser-dynamic"],
       "@angular/platform-browser-dynamic/testing": ["src/app/packages/angular/platform-browser-dynamic/testing"],
@@ -26,14 +28,21 @@
     "typeRoots": [
       "node_modules/@types"
     ],
+    "types": [
+    ],
     "lib": [
       "es2017",
       "dom"
     ],
     "sourceRoot": "."
   },
+  "files": [
+    "module.ts",
+    "../packages/angular/types.d.ts"
+  ],
   "angularCompilerOptions": {
     "genDir": ".",
-    "debug": true
+    "debug": true,
+    "skipTemplateCodegen": false
   }
 }
