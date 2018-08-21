@@ -84,11 +84,27 @@
     rxjs "^6.0.0"
     source-map "^0.5.6"
 
+"@angular-devkit/core@0.7.4":
+  version "0.7.4"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/core/-/core-0.7.4.tgz#707ac5a8b534b5768c334ff8d35b0ec754938c58"
+  dependencies:
+    ajv "~6.4.0"
+    chokidar "^2.0.3"
+    rxjs "^6.0.0"
+    source-map "^0.5.6"
+
 "@angular-devkit/schematics@0.6.7":
   version "0.6.7"
   resolved "http://registry.npm.taobao.org/@angular-devkit/schematics/download/@angular-devkit/schematics-0.6.7.tgz#7bd3c1d707cb04162bc199feacfbb1fb2ec6a5ab"
   dependencies:
     "@angular-devkit/core" "0.6.7"
+    rxjs "^6.0.0"
+
+"@angular-devkit/schematics@0.7.4":
+  version "0.7.4"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/schematics/-/schematics-0.7.4.tgz#18d7a58ab67acab4b6f404bd65e8765a581307ed"
+  dependencies:
+    "@angular-devkit/core" "0.7.4"
     rxjs "^6.0.0"
 
 "@angular/cli@~6.0.5":
@@ -133,6 +149,15 @@
   version "6.0.3"
   resolved "http://registry.npm.taobao.org/@angular/language-service/download/@angular/language-service-6.0.3.tgz#7182f3824520fd5f5f6173fdee80284356d29d08"
 
+"@angular/pwa@^0.7.4":
+  version "0.7.4"
+  resolved "https://registry.yarnpkg.com/@angular/pwa/-/pwa-0.7.4.tgz#cc2a6f9674705de899a67f0ded6b3c9cdde6e9a0"
+  dependencies:
+    "@angular-devkit/core" "0.7.4"
+    "@angular-devkit/schematics" "0.7.4"
+    "@schematics/angular" "0.7.4"
+    typescript "~2.6.2"
+
 "@angular/upgrade@^6.0.5":
   version "6.0.5"
   resolved "http://registry.npm.taobao.org/@angular/upgrade/download/@angular/upgrade-6.0.5.tgz#2364ff22b30c7ebabea50563e9de8ca1ce9cf7b0"
@@ -158,6 +183,14 @@
     "@angular-devkit/core" "0.6.7"
     "@angular-devkit/schematics" "0.6.7"
     typescript ">=2.6.2 <2.8"
+
+"@schematics/angular@0.7.4":
+  version "0.7.4"
+  resolved "https://registry.yarnpkg.com/@schematics/angular/-/angular-0.7.4.tgz#03012ca1fbc161b137dabc26ba04bd31d2ca687e"
+  dependencies:
+    "@angular-devkit/core" "0.7.4"
+    "@angular-devkit/schematics" "0.7.4"
+    typescript ">=2.6.2 <2.10"
 
 "@schematics/update@0.6.7":
   version "0.6.7"
@@ -5914,9 +5947,17 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "http://registry.npm.taobao.org/typedarray/download/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
+"typescript@>=2.6.2 <2.10":
+  version "2.9.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.9.2.tgz#1cbf61d05d6b96269244eb6a3bce4bd914e0f00c"
+
 "typescript@>=2.6.2 <2.8", typescript@~2.7.2:
   version "2.7.2"
   resolved "http://registry.npm.taobao.org/typescript/download/typescript-2.7.2.tgz#2d615a1ef4aee4f574425cdff7026edf81919836"
+
+typescript@~2.6.2:
+  version "2.6.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.6.2.tgz#3c5b6fd7f6de0914269027f03c0946758f7673a4"
 
 uglify-es@^3.3.4:
   version "3.3.9"

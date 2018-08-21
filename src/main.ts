@@ -16,6 +16,7 @@ import {BrowserPlatformLocation} from './app/packages/angular/platform-browser/s
 import {_document, initDomAdapter} from './app/packages/angular/platform-browser/src/browser';
 import {DOCUMENT} from './app/packages/angular/platform-browser/src/dom/dom_tokens';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
+import {OverlayModule} from './app/demo/overlay/overlay.module';
 // import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 
 if (environment.production) {
@@ -24,7 +25,7 @@ if (environment.production) {
 
 const platform = platformBrowserDynamic();
 
-platform.bootstrapModule(AppModule)
+platform.bootstrapModule(OverlayModule)
   .catch(err => console.log(err));
 
 
