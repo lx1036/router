@@ -168,7 +168,7 @@ export class NgModel extends NgControl implements OnChanges,
               @Optional() @Self() @Inject(NG_VALUE_ACCESSOR) valueAccessors: ControlValueAccessor[]) {
                 super();
                 
-                console.log(NgModel.name);
+                // console.log(NgModel.name);
 
                 // console.trace();
 
@@ -177,7 +177,7 @@ export class NgModel extends NgControl implements OnChanges,
                 this._parent = parent;
                 // console.log('parent', parent.constructor.name);
 
-                console.log(validators);
+                // console.log(validators);
                 this._rawValidators = validators || [];
                 this._rawAsyncValidators = asyncValidators || [];
                 this.valueAccessor = selectValueAccessor(this, valueAccessors);
@@ -194,7 +194,7 @@ export class NgModel extends NgControl implements OnChanges,
                   this._updateDisabled(changes);
                 }
 
-                console.log(changes, this.viewModel, this.model);
+                // console.log(changes, this.viewModel, this.model);
 
                 if (isPropertyUpdated(changes, this.viewModel)) {
                   console.log('viewModel', this.viewModel);

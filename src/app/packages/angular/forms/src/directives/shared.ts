@@ -44,7 +44,7 @@ export function setUpControl(control: FormControl, dir: NgControl): void {
   control.validator = Validators.compose([control.validator !, dir.validator]);
   control.asyncValidator = Validators.composeAsync([control.asyncValidator !, dir.asyncValidator]);
 
-  console.log('value', control.value);
+  // console.log('value', control.value);
   dir.valueAccessor !.writeValue(control.value);
 
   setUpViewChangePipeline(control, dir);

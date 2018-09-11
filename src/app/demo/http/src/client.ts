@@ -5,13 +5,13 @@ import {concatMap} from 'rxjs/operators';
 
 
 interface HttpHandler {
-  handle(request: HttpRequest): Observable<Response>;
+  handle(request: Request): Observable<Response>;
 }
 
 
 @Injectable()
-export class HttpXhrHandler implements HttpHandler {
-  handle(request: HttpRequest): Observable<Response> {
+export class XhrHandler implements HttpHandler {
+  handle(request: Request): Observable<Response> {
     const xhr = new XMLHttpRequest();
     xhr.open(request.method, request.uri);
 
@@ -34,9 +34,9 @@ export class HttpXhrHandler implements HttpHandler {
        * cache-control: public, max-age=14400
        * expires: Sat, 08 Sep 2018 17:04:37 GMT
        */
-      const headers = new HttpHeaders(xhr.getAllResponseHeaders());
+      const headers = new Headers(xhr.getAllResponseHeaders());
       
-      return new HttpResponse(xhr.response, headers, xhr.status, xhr.statusText);
+      return new Response(xhr.response, headers, xhr.status, xhr.statusText);
     };
     xhr.addEventListener('load', onLoad);
     
@@ -52,11 +52,11 @@ export class HttpXhrHandler implements HttpHandler {
 }
 
 
-class HttpResponse {
-  constructor(private body, private headers: HttpHeaders, private status, private statusText) {}
+class Response {
+  constructor(private body, private headers: Headers, private status, private statusText) {}
 }
 
-class HttpHeaders {
+class Headers {
   headers: Map<string, string[]>;
   
   
@@ -76,9 +76,9 @@ class HttpHeaders {
   }
 }
 
-export class HttpRequest {
+export class Request {
   withCredentials: boolean;
-  headers: HttpHeaders;
+  headers: Headers;
   
   constructor(public method: Methods, public uri: string, options?: {}) {
 
@@ -103,7 +103,7 @@ export class HttpClient {
 
   }): Observable<any>
   {
-    let request = new HttpRequest(method, uri, options);
+    let request = new Request(method, uri, options);
 
     let response = of(request).pipe(concatMap((request) => this.handler.handle(request)));
 

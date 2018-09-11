@@ -204,7 +204,7 @@ export class Validators {
     if (presentValidators.length == 0) return null;
 
     return function(control: AbstractControl) {
-      console.log('presentValidators', presentValidators);
+      // console.log('presentValidators', presentValidators);
       
       return _mergeErrors(_executeValidators(control, presentValidators));
     };
