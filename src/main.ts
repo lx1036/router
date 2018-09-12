@@ -17,9 +17,10 @@ import {_document, initDomAdapter} from './app/packages/angular/platform-browser
 import {DOCUMENT} from './app/packages/angular/platform-browser/src/dom/dom_tokens';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {OverlayModule} from './app/demo/overlay/overlay.module';
-import {DemoHttpModule} from './app/demo/http/http';
-import {TestCustomHttpClientModule} from "./app/demo/http/tests/client";
-import {DemoFormsModule} from "./app/forms/form";
+import {DemoHttpModule} from './app/framework/http/http';
+import {TestCustomHttpClientModule} from "./app/framework/http/tests/client";
+import {DemoFormsModule} from "./app/framework/forms/form";
+import {DemoZoneModule} from "./app/demo/zone/zone";
 // import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 
 if (environment.production) {
@@ -31,7 +32,8 @@ const platform = platformBrowserDynamic();
 // platform.bootstrapModule(OverlayModule)
 // platform.bootstrapModule(DemoHttpModule)
 // platform.bootstrapModule(TestCustomHttpClientModule)
-platform.bootstrapModule(DemoFormsModule)
+// platform.bootstrapModule(DemoFormsModule)
+platform.bootstrapModule(DemoZoneModule)
   .catch(err => console.log(err));
 
 

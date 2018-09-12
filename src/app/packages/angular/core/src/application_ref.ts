@@ -85,7 +85,7 @@ export function createPlatform(injector: Injector): PlatformRef {
         'There can be only one platform. Destroy the previous one to create a new one.');
   }
 
-  console.log(injector.toString());
+  // console.log(injector.toString());
   _platform = injector.get(PlatformRef);
   const inits = injector.get(PLATFORM_INITIALIZER, null);
   if (inits) inits.forEach((init: any) => init());
@@ -107,12 +107,12 @@ export function createPlatformFactory(
     let platform = getPlatform();
     if (!platform || platform.injector.get(ALLOW_MULTIPLE_PLATFORMS, false)) {
       if (parentPlatformFactory) {
-        console.log(marker.toString()); // 1. InjectionToken Platform: browserDynamic -> 2. InjectionToken Platform: coreDynamic
+        // console.log(marker.toString()); // 1. InjectionToken Platform: browserDynamic -> 2. InjectionToken Platform: coreDynamic
 
         parentPlatformFactory(
             providers.concat(extraProviders).concat({provide: marker, useValue: true}));
       } else {
-        console.log(marker.toString()); // 3. InjectionToken Platform: core
+        // console.log(marker.toString()); // 3. InjectionToken Platform: core
         const injectedProviders: StaticProvider[] =
             providers.concat(extraProviders).concat({provide: marker, useValue: true});
 
@@ -224,7 +224,7 @@ export class PlatformRef {
   bootstrapModuleFactory<M>(moduleFactory: NgModuleFactory<M>, options?: BootstrapOptions):
       Promise<NgModuleRef<M>> {
 
-    console.log('moduleFactory', moduleFactory);
+    // console.log('moduleFactory', moduleFactory);
 
     // Note: We need to create the NgZone _before_ we instantiate the module,
     // as instantiating the module creates some providers eagerly.
