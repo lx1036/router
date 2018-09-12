@@ -95,6 +95,11 @@ export class Request {
 
 type Methods = 'GET'|'POST'|'PUT'|'DELETE'|'HEAD'|'OPTIONS';
 
+
+/**
+ * Perform HTTP requests.
+ *
+ */
 @Injectable()
 export class HttpClient {
   constructor(private handler: HttpHandler) {}
@@ -110,7 +115,7 @@ export class HttpClient {
     return response;
   }
   
-  get(uri: string) {
+  get(uri: string): Observable<any> {
     return this.request('GET', uri);
   }
 }
@@ -121,24 +126,9 @@ export class HttpClient {
 
 
 
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
+/**
+ * Handler(send xhr request) + Interceptor(intercept xhr request, do something)
+ */
 @NgModule({
   providers: [
     HttpClient,
