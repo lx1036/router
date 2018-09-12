@@ -43,6 +43,9 @@ export class ErrorHandler {
   _console: Console = console;
 
   handleError(error: any): void {
+    this._console.trace();
+    this._console.log(error['ngErrorLogger']);
+    
     const originalError = this._findOriginalError(error);
     const context = this._findContext(error);
     // Note: Browser consoles show the place from where console.error was called.

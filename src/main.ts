@@ -21,6 +21,7 @@ import {DemoHttpModule} from './app/framework/http/http';
 import {TestCustomHttpClientModule} from "./app/framework/http/tests/client";
 import {DemoFormsModule} from "./app/framework/forms/form";
 import {DemoZoneModule} from "./app/demo/zone/zone";
+import {FormValidationModule} from "./app/demo/forms/form";
 // import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 
 if (environment.production) {
@@ -33,7 +34,8 @@ const platform = platformBrowserDynamic();
 // platform.bootstrapModule(DemoHttpModule)
 // platform.bootstrapModule(TestCustomHttpClientModule)
 // platform.bootstrapModule(DemoFormsModule)
-platform.bootstrapModule(DemoZoneModule)
+// platform.bootstrapModule(DemoZoneModule)
+platform.bootstrapModule(FormValidationModule)
   .catch(err => console.log(err));
 
 
