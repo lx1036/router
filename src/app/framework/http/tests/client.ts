@@ -1,6 +1,8 @@
 import {Component, NgModule, OnInit} from "@angular/core";
 import {BrowserModule} from "@angular/platform-browser";
-import {HttpClient, HttpModule} from "../src/client";
+import {HttpClient, CustomHttpModule} from "../src/manager";
+import {Request, Response} from "../src/model";
+import {HTTP_INTERCEPTORS, HttpHandler, Interceptor} from "../src/handler";
 
 
 
@@ -22,13 +24,24 @@ export class DemoHttp implements OnInit {
   }
   
   ngOnInit() {
-    this.http.get('https://jsonplaceholder.typicode.com/posts/1').subscribe(res => {
+    this.http.get('https://jsonplaceholder.typicode.com/posts/1').subscribe((res: Response<any>) => {
+      console.log(res);
       this.posts = res;
     });
   }
 }
 
 
+
+export class CustomInterceptor implements Interceptor{
+  intercept(request: Request<any>, next: HttpHandler) {
+    request = request.clone({
+      setHeaders: {'Custom-Header-1': ['a']}
+    });
+
+    return next.handle(request);
+  }
+}
 
 
 
@@ -38,10 +51,11 @@ export class DemoHttp implements OnInit {
   ],
   imports: [
     BrowserModule,
-    
-    HttpModule,
+
+    CustomHttpModule,
   ],
   providers: [
+    {provide: HTTP_INTERCEPTORS, useClass: CustomInterceptor, multi: true}
   ],
   bootstrap: [DemoHttp]
 })

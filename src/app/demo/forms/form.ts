@@ -64,7 +64,7 @@ export class AppComponent implements OnInit {
 }
 
 
-export class SentryHandler implements ErrorHandler {
+export class SentryHandler extends ErrorHandler {
   handleError(error: any) {
   
   }
