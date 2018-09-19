@@ -2,6 +2,7 @@
 
 # compiled output
 /dist
+dist/*.js
 /tmp/*.js
 /out-tsc
 
@@ -37,6 +38,7 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
-*.js
 src/app/compiler/dist
 src/app/compiler/node_modules
+src/app/compiler/*.js
+src/app/packages/angular/core/src/*/*.js

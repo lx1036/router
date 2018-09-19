@@ -1,6 +1,7 @@
-import {Observable, Observer, Subscriber} from "rxjs";
-import {Injectable, InjectionToken, Injector} from "@angular/core";
-import {Request, HttpEvent, ErrorResponse, Response, Headers, EventType, HeaderResponse} from "./model";
+import {Observable, Observer, of, Subscriber} from "rxjs";
+import {Injectable, InjectionToken, Injector, NgModule} from "@angular/core";
+import {Request, HttpEvent, ErrorResponse, Response, Headers, EventType, HeaderResponse, Methods} from "./model";
+import {concatMap} from "rxjs/operators";
 
 
 
@@ -119,12 +120,11 @@ export class XhrBackend implements HttpBackend {
 
       // send the request, and notify the event stream
       xhr.send(requestBody);
-      subscriber.next({type: EventType.Sent});
+      // subscriber.next({type: EventType.Sent});
 
       return () => {};
     });
   }
-
 }
 
 
@@ -143,7 +143,7 @@ export class HttpInterceptorHandler implements HttpHandler {
 
 
 @Injectable()
-export class HttpHandlerService implements HttpHandler {
+export class HttpInterceptingHandler implements HttpHandler {
   constructor(private _injector: Injector, private _backend: HttpBackend) {}
 
   handle(request: Request<any>): Observable<HttpEvent<any>> {
@@ -157,12 +157,19 @@ export class HttpHandlerService implements HttpHandler {
      * interceptor_handler3 = InterceptorHandler(interceptor_handler2, interceptor1) ->
      * interceptor_handler3.handle(request)
      *
+     *
+     * Register: handler = new InterceptorHandler(new InterceptorHandler(new InterceptorHandler(xhrHandler, interceptor3), interceptor2), interceptor1)
+     * Run: handler.handle(request)
+     * interceptor1.intercept(request, new InterceptorHandler(new InterceptorHandler(xhrHandler, interceptor3), interceptor2)) =
+     * new InterceptorHandler(new InterceptorHandler(xhrHandler, interceptor3), interceptor2).handle(request)
+     * interceptor2.intercept(request, new InterceptorHandler(xhrHandler, interceptor3)) = new InterceptorHandler(xhrHandler, interceptor3).handle(request)
+     * interceptor3.intercept(request, xhrHandler) = xhrHandler.handle(request): Observable<HttpEvent<any>>
+     *
+     *
      * Run:
-     * interceptor_handler3.handle(request) ->
-     * interceptor1.intercept(request, interceptor_handler2) ->
-     * interceptor2.intercept(request, interceptor_handler1) ->
-     * interceptor3.intercept(request, handler) ->
-     * handler.handle(request)
+     * interceptor_handler3.handle(request) -> interceptor_handler3.intercept(request, interceptor_handler2)
+     * -> interceptor_handler2.handle(request) -> interceptor_handler1.intercept(request, interceptor_handler)
+     * ->interceptor_handler.handle(request) = XhrBackend.handle(request)
      */
     const chain: HttpHandler = interceptors.reduceRight(
       (handler: HttpHandler, interceptor: Interceptor) => new HttpInterceptorHandler(handler, interceptor),
@@ -171,5 +178,51 @@ export class HttpHandlerService implements HttpHandler {
 
     return chain.handle(request);
   }
+}
+
+
+
+
+
+
+/**
+ * *******************************************MODULE********************************************************************
+ */
+
+/**
+ * Perform HTTP requests.
+ *
+ */
+@Injectable()
+export class HttpClient {
+  constructor(private handler: HttpHandler) {}
+  
+  request(method: Methods, uri: string, options?: {}): Observable<HttpEvent<any>> {
+    let request = new Request(method, uri, options);
+    
+    let response = of(request).pipe(concatMap(
+      (request: Request<any>): Observable<HttpEvent<any>> => this.handler.handle(request)
+    ));
+    
+    return response;
+  }
+  
+  get(uri: string): Observable<any> {
+    return this.request('GET', uri);
+  }
+}
+
+/**
+ * Handler(send xhr request) + Interceptor(intercept xhr request, do something)
+ */
+@NgModule({
+  providers: [
+    HttpClient,
+    {provide: HttpHandler, useClass: HttpInterceptingHandler},
+    {provide: HttpBackend, useClass: XhrBackend},
+    {provide: HTTP_INTERCEPTORS, useClass: NoopInterceptor, multi: true}
+  ]
+})
+export class CustomHttpModule {
 
 }

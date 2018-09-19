@@ -1,6 +1,6 @@
 import {Component, NgModule, OnInit} from "@angular/core";
 import {BrowserModule} from "@angular/platform-browser";
-import {HttpClient, CustomHttpModule} from "../src/manager";
+import {HttpClient, CustomHttpModule} from "../src/handler";
 import {Request, Response} from "../src/model";
 import {HTTP_INTERCEPTORS, HttpHandler, Interceptor} from "../src/handler";
 
@@ -30,7 +30,6 @@ export class DemoHttp implements OnInit {
     });
   }
 }
-
 
 
 export class CustomInterceptor implements Interceptor{
