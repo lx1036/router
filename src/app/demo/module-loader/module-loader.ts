@@ -13,7 +13,6 @@ import {BrowserModule} from "@angular/platform-browser";
 @Component({
   selector: 'demo-module-loader',
   template: `
-    <hello name="{{ name }}"></hello>
     <p>
       Start editing to see some magic happen :)
     </p>
@@ -29,8 +28,9 @@ export class AppComponent  {
     private readonly injector: Injector,
     private readonly vcr: ViewContainerRef,
   ) {}
+
   loadComponent() {
-    this.loader.load('hero.module#HeroModule')
+    this.loader.load('app/demo/module-loader/hero.module#HeroModule')
       .then(factory => {
         const moduleRef = factory.create(this.injector);
         const anyComponentType = moduleRef.injector.get('ProvidedBitkanHero');
@@ -49,6 +49,12 @@ export class AppComponent  {
   ],
   bootstrap: [
     AppComponent
+  ],
+  providers: [
+    {
+      provide: NgModuleFactoryLoader,
+      useClass: SystemJsNgModuleLoader
+    }
   ]
 })
 export class DemoModuleLoaderModule {

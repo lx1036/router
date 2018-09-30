@@ -119,7 +119,7 @@ export class XhrBackend implements HttpBackend {
       }
 
       // send the request, and notify the event stream
-      xhr.send(requestBody);
+      // xhr.send(requestBody);
       // subscriber.next({type: EventType.Sent});
 
       return () => {};
@@ -131,6 +131,8 @@ export class XhrBackend implements HttpBackend {
 
 
 /**
+ * Decorator Pattern
+ *
  * Tree Structure
  */
 export class HttpInterceptorHandler implements HttpHandler {

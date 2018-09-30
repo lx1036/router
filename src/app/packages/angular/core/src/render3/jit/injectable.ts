@@ -94,7 +94,7 @@ export function compileInjectable(type: Type<any>, srcMeta?: Injectable): void {
 
 function computeProvidedIn(providedIn: Type<any>| string | null | undefined): Expression {
   if (providedIn == null || typeof providedIn === 'string') {
-    return new LiteralExpr(providedIn);
+    return new LiteralExpr(<string|null>providedIn);
   } else {
     return new WrappedNodeExpr(providedIn);
   }

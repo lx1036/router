@@ -29,4 +29,4 @@ export class MainModule {
 let option = {providedIn: 'test'};
 type person = {providedIn: string};
 
-let test: person & {useValue: any} = {useValue: 1, providedIn: 'a'};
+let testAdvancedTypes: person & {useValue: any} = {useValue: 1, providedIn: 'a'};

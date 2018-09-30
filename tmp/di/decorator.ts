@@ -1,6 +1,3 @@
-import {Type} from '../../src/app/packages/angular/core/src/type';
-import {TypeDecorator, ANNOTATIONS} from '../../src/app/packages/angular/core/src/util/decorators';
-import {DirectiveDecorator} from '../../src/app/packages/angular/core/src/metadata/directives';
 
 
 /**
@@ -8,11 +5,7 @@ import {DirectiveDecorator} from '../../src/app/packages/angular/core/src/metada
  */
 
 
-export interface Directive {
-  selector?: string;
-}
-
-
+/*
 export function makeDecorator(name: string, props?: (...args: any[]) => any, parentClass?: any, chainFn?: (fn: Function) => void, typeFn?: (type: Type<any>, ...args: any[]) => void):
   {new (...args: any[]): any; (...args: any[]): any; (...args: any[]): (cls: any) => any;} {
   const metaCtor = makeMetadataCtor(props);
@@ -69,11 +62,103 @@ function makeMetadataCtor(props?: (...args: any[]) => any): any {
 export const Directive: DirectiveDecorator = makeDecorator('Directive', (dir: Directive = {}) => dir);
 
 
+
+*/
+// console.log(Directive, Directive({selector: 'test'}), new AppDirective());
+
+
+/**
+ *
+ */
+
+export const ANNOTATIONS = '__annotations__';
+export const PARAMETERS = '__parameters__';
+export const PROP_METADATA = '__prop__metadata__';
+
+
+function makeMetadata(props?: (...args: any[]) => any): (...args: any[]) => any {
+  return (...args: any[]) => {
+    if (props) {
+      const value = props(...args);
+      
+      
+    }
+  };
+}
+
+function decoratorFactory(...args: any[]): (...args: any[]) => any {
+  
+  if (this instanceof decoratorFactory) {
+    return this;
+  }
+  
+  console.log(args);
+  
+  const annotationInstance = new (decoratorFactory as any)(...args);
+  
+  return (className) => {
+    console.log(className);
+    
+    const annotations = className.hasOwnProperty(ANNOTATIONS) ? className[ANNOTATIONS] :
+      Object.defineProperty(className, ANNOTATIONS, {value: []})[ANNOTATIONS];
+    
+    console.log(annotations);
+    annotations.push(annotationInstance);
+    
+    return className;
+  };
+}
+
+function makeDecorator(name: string, props?: (...args: any[]) => any): (...args: any[]) => any {
+  // const metadata = makeMetadata(props);
+  
+  console.log(name);
+  
+  decoratorFactory.prototype.ngMetadataName = name;
+  (decoratorFactory as any).annotationClassName = decoratorFactory;
+  
+  return decoratorFactory;
+}
+
+
+interface DirectiveDecorator {
+  new (obj: Directive): Directive;
+}
+
+export interface Directive {
+  selector?: string;
+}
+
+export interface Component extends Directive {
+}
+
+
+export enum ChangeDetectionStrategy {
+  OnPush = 0,
+  Default = 1,
+}
+export const Directive = makeDecorator(
+  'Directive', (dir: Directive = {}) => dir);
+
+export const Component = makeDecorator(
+  'Component', (c: Component = {}) => ({changeDetection: ChangeDetectionStrategy.Default, ...c}));
+
+
+
 @Directive({
-  selector: 'app'
+  selector: 'app-directive'
 })
 export class AppDirective {
 
 }
 
-// console.log(Directive, Directive({selector: 'test'}), new AppDirective());
+@Component({
+  selector: 'app-component'
+})
+export class AppComponent {
+
+}
+
+
+
+

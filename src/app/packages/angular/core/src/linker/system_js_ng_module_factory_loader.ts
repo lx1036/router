@@ -66,8 +66,10 @@ export class SystemJsNgModuleLoader implements NgModuleFactoryLoader {
       exportName = 'default';
     }
 
+    console.log(module, exportName);
+
     return System.import(module)
-        .then((module: any) => module[exportName])
+        .then((module: any) => {console.log(module); return module[exportName];})
         .then((type: any) => checkNotEmpty(type, module, exportName))
         .then((type: any) => this._compiler.compileModuleAsync(type));
   }
