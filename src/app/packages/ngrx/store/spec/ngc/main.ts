@@ -5,7 +5,6 @@ import { Observable } from 'rxjs';
 import { combineReducers, select, Store, StoreModule } from '../../';
 import { counterReducer, DECREMENT, INCREMENT } from '../fixtures/counter';
 import { todos } from '../fixtures/todos';
-import {InitialState} from '../../src/models';
 
 @Component({
   selector: 'ngc-spec-child-component',
@@ -55,7 +54,7 @@ export class NgcSpecComponent {
   imports: [
     BrowserModule,
     StoreModule.forRoot(reducerToken, {
-      initialState: ({count: 0} as InitialState<object>),
+      initialState: { count: 0 },
       reducerFactory: combineReducers,
     }),
     FeatureModule,

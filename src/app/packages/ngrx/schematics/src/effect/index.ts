@@ -35,7 +35,7 @@ function addImportToNgModule(options: EffectOptions): Rule {
     }
 
     if (!host.exists(modulePath)) {
-      throw new Error('Specified module does not exist');
+      throw new Error(`Specified module path ${modulePath} does not exist`);
     }
 
     const text = host.read(modulePath);
@@ -121,15 +121,7 @@ export default function(options: EffectOptions): Rule {
 
     return chain([
       branchAndMerge(
-        chain([
-          filter(
-            path =>
-              path.endsWith('.module.ts') &&
-              !path.endsWith('-routing.module.ts')
-          ),
-          addImportToNgModule(options),
-          mergeWith(templateSource),
-        ])
+        chain([addImportToNgModule(options), mergeWith(templateSource)])
       ),
     ])(host, context);
   };

@@ -16,7 +16,7 @@ export function addReducerToState(options: any): Rule {
     const reducersPath = normalize(`/${options.path}/${options.reducers}`);
 
     if (!host.exists(reducersPath)) {
-      throw new Error('Specified reducers path does not exist');
+      throw new Error(`Specified reducers path ${reducersPath} does not exist`);
     }
 
     const text = host.read(reducersPath);
@@ -49,7 +49,7 @@ export function addReducerToState(options: any): Rule {
       true
     );
 
-    const stateInferfaceInsert = addReducerToStateInferface(
+    const stateInterfaceInsert = addReducerToStateInterface(
       source,
       reducersPath,
       options
@@ -60,7 +60,7 @@ export function addReducerToState(options: any): Rule {
       options
     );
 
-    const changes = [reducerImport, stateInferfaceInsert, reducerMapInsert];
+    const changes = [reducerImport, stateInterfaceInsert, reducerMapInsert];
     const recorder = host.beginUpdate(reducersPath);
     for (const change of changes) {
       if (change instanceof InsertChange) {
@@ -76,7 +76,7 @@ export function addReducerToState(options: any): Rule {
 /**
  * Insert the reducer into the first defined top level interface
  */
-export function addReducerToStateInferface(
+export function addReducerToStateInterface(
   source: ts.SourceFile,
   reducersPath: string,
   options: { name: string }
@@ -192,7 +192,7 @@ export function addReducerImportToNgModule(options: any): Rule {
 
     const modulePath = options.module;
     if (!host.exists(options.module)) {
-      throw new Error('Specified module does not exist');
+      throw new Error(`Specified module path ${modulePath} does not exist`);
     }
 
     const text = host.read(modulePath);
