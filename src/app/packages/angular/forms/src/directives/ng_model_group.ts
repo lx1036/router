@@ -39,15 +39,12 @@ export const modelGroupProvider: any = {
  *
  * {@example forms/ts/ngModelGroup/ng_model_group_example.ts region='Component'}
  *
- * * **npm package**: `@angular/forms`
- *
- * * **NgModule**: `FormsModule`
- *
- *
+ * @ngModule FormsModule
  */
 @Directive({selector: '[ngModelGroup]', providers: [modelGroupProvider], exportAs: 'ngModelGroup'})
 export class NgModelGroup extends AbstractFormGroupDirective implements OnInit, OnDestroy {
-  @Input('ngModelGroup') name: string;
+  // TODO(issue/24571): remove '!'.
+  @Input('ngModelGroup') name !: string;
 
   constructor(
       @Host() @SkipSelf() parent: ControlContainer,

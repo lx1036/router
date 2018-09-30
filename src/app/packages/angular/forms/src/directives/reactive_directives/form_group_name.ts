@@ -39,6 +39,7 @@ export const formGroupNameProvider: any = {
  * form separately from the rest or when you'd like to group the values of certain
  * controls into their own nested object.
  *
+ * @usageNotes
  * **Access the group**: You can access the associated `FormGroup` using the
  * {@link AbstractControl#get get} method. Ex: `this.form.get('name')`.
  *
@@ -61,15 +62,12 @@ export const formGroupNameProvider: any = {
  *
  * {@example forms/ts/nestedFormGroup/nested_form_group_example.ts region='Component'}
  *
- * * **npm package**: `@angular/forms`
- *
- * * **NgModule**: `ReactiveFormsModule`
- *
- *
+ * @ngModule ReactiveFormsModule
  */
 @Directive({selector: '[formGroupName]', providers: [formGroupNameProvider]})
 export class FormGroupName extends AbstractFormGroupDirective implements OnInit, OnDestroy {
-  @Input('formGroupName') name: string;
+  // TODO(issue/24571): remove '!'.
+  @Input('formGroupName') name !: string;
 
   constructor(
       @Optional() @Host() @SkipSelf() parent: ControlContainer,
@@ -110,6 +108,7 @@ export const formArrayNameProvider: any = {
  * you're not sure how many there will be. Form arrays allow you to create new
  * form controls dynamically.
  *
+ * @usageNotes
  * **Access the array**: You can access the associated `FormArray` using the
  * {@link AbstractControl#get get} method on the parent `FormGroup`.
  * Ex: `this.form.get('cities')`.
@@ -135,11 +134,7 @@ export const formArrayNameProvider: any = {
  *
  * {@example forms/ts/nestedFormArray/nested_form_array_example.ts region='Component'}
  *
- * * **npm package**: `@angular/forms`
- *
- * * **NgModule**: `ReactiveFormsModule`
- *
- *
+ * @ngModule ReactiveFormsModule
  */
 @Directive({selector: '[formArrayName]', providers: [formArrayNameProvider]})
 export class FormArrayName extends ControlContainer implements OnInit, OnDestroy {
@@ -152,15 +147,14 @@ export class FormArrayName extends ControlContainer implements OnInit, OnDestroy
   /** @internal */
   _asyncValidators: any[];
 
-  @Input('formArrayName') name: string;
+  // TODO(issue/24571): remove '!'.
+  @Input('formArrayName') name !: string;
 
   constructor(
       @Optional() @Host() @SkipSelf() parent: ControlContainer,
       @Optional() @Self() @Inject(NG_VALIDATORS) validators: any[],
       @Optional() @Self() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: any[]) {
     super();
-
-    console.log('parent', parent.constructor.name); // FormGroupDirective
     this._parent = parent;
     this._validators = validators;
     this._asyncValidators = asyncValidators;

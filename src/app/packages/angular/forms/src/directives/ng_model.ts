@@ -20,8 +20,6 @@ import {NgModelGroup} from './ng_model_group';
 import {composeAsyncValidators, composeValidators, controlPath, isPropertyUpdated, selectValueAccessor, setUpControl} from './shared';
 import {TemplateDrivenErrors} from './template_driven_errors';
 import {AsyncValidator, AsyncValidatorFn, Validator, ValidatorFn} from './validators';
-import {NumberValueAccessor} from './number_value_accessor';
-import {DefaultValueAccessor} from './default_value_accessor';
 
 export const formControlBinding: any = {
   provide: NgControl,
@@ -99,11 +97,7 @@ const resolvedPromise = Promise.resolve(null);
  * * Radio buttons: `RadioControlValueAccessor`
  * * Selects: `SelectControlValueAccessor`
  *
- * **npm package**: `@angular/forms`
- *
- * **NgModule**: `FormsModule`
- *
- *
+ * @ngModule FormsModule
  */
 @Directive({
   selector: '[ngModel]:not([formControlName]):not([formControl])',
@@ -117,8 +111,10 @@ export class NgModel extends NgControl implements OnChanges,
   _registered = false;
   viewModel: any;
 
-  @Input() name: string;
-  @Input('disabled') isDisabled: boolean;
+  // TODO(issue/24571): remove '!'.
+  @Input() name !: string;
+  // TODO(issue/24571): remove '!'.
+  @Input('disabled') isDisabled !: boolean;
   @Input('ngModel') model: any;
 
   /**
@@ -158,46 +154,32 @@ export class NgModel extends NgControl implements OnChanges,
    * ```
    *
    */
-  @Input('ngModelOptions') options: {name?: string, standalone?: boolean, updateOn?: FormHooks};
+  // TODO(issue/24571): remove '!'.
+  @Input('ngModelOptions')
+  options !: {name?: string, standalone?: boolean, updateOn?: FormHooks};
 
   @Output('ngModelChange') update = new EventEmitter();
 
   constructor(@Optional() @Host() parent: ControlContainer,
               @Optional() @Self() @Inject(NG_VALIDATORS) validators: Array<Validator|ValidatorFn>,
               @Optional() @Self() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<AsyncValidator|AsyncValidatorFn>,
-              @Optional() @Self() @Inject(NG_VALUE_ACCESSOR) valueAccessors: ControlValueAccessor[]) {
+              @Optional() @Self() @Inject(NG_VALUE_ACCESSOR)
+              valueAccessors: ControlValueAccessor[]) {
                 super();
-                
-                // console.log(NgModel.name);
-
-                // console.trace();
-
-                // console.log('ControlValueAccessor:', valueAccessors); // NumberValueAccessor/DefaultValueAccessor
-
                 this._parent = parent;
-                // console.log('parent', parent.constructor.name);
-
-                // console.log(validators);
                 this._rawValidators = validators || [];
                 this._rawAsyncValidators = asyncValidators || [];
                 this.valueAccessor = selectValueAccessor(this, valueAccessors);
               }
 
               ngOnChanges(changes: SimpleChanges) {
-
                 this._checkForErrors();
-                /**
-                 * _setUpControl 就是把 ngModel 绑定的 control 注册到父 control 上
-                 */
                 if (!this._registered) this._setUpControl();
                 if ('isDisabled' in changes) {
                   this._updateDisabled(changes);
                 }
 
-                // console.log(changes, this.viewModel, this.model);
-
                 if (isPropertyUpdated(changes, this.viewModel)) {
-                  console.log('viewModel', this.viewModel);
                   this._updateValue(this.model);
                   this.viewModel = this.model;
                 }
@@ -240,18 +222,6 @@ export class NgModel extends NgControl implements OnChanges,
               }
 
               private _setUpStandalone(): void {
-                /**
-                 * ngModel 单独使用时，通过 ControlValueAccessor 来绑定一个 FormControl 对象和一个 DOM 元素
-                 * ControlValueAccessor.writeValue(FormControl.value)
-                 * setUpViewChangePipeline(FormControl, NgControl)
-                 * setUpModelChangePipeline(FormControl, NgControl)
-                 * setUpBlurPipeline(FormControl, NgControl)
-                 */
-                /**
-                 * Template-Driven-Directives 就是个绑定 FormControl 对象和 DOM 元素的场所，
-                 * 绑定的意思是：FormControl 对象的 value 变化，DOM 元素的 value 同步变化[setUpModelChangePipeline()]；
-                 * DOM 元素的值变化，FormControl 对象的 value 同步变化[setUpViewChangePipeline()]
-                 */
                 setUpControl(this.control, this);
                 this.control.updateValueAndValidity({emitEvent: false});
               }
