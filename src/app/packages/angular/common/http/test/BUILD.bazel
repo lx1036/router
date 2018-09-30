@@ -8,14 +8,12 @@ ts_library(
         exclude = ["**/*_node_only_spec.ts"],
     ),
     deps = [
-        "//packages/common",
-        "//packages/common/locales",
-        "//packages/compiler",
+        "//packages/common/http",
+        "//packages/common/http/testing",
         "//packages/core",
         "//packages/core/testing",
-        "//packages/platform-browser",
-        "//packages/platform-browser-dynamic",
-        "//packages/platform-browser/testing",
+        "@rxjs",
+        "@rxjs//operators",
     ],
 )
 

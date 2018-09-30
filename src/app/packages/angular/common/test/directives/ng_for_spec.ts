@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {CommonModule, NgForOf} from '@angular/common';
-import {Component, Directive} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {Component} from '@angular/core';
 import {ComponentFixture, TestBed, async} from '@angular/core/testing';
 import {By} from '@angular/platform-browser/src/dom/debug/by';
 import {expect} from '@angular/platform-browser/testing/src/matchers';
@@ -183,9 +183,12 @@ let thisArg: any;
 
     it('should allow of saving the collection', async(() => {
          const template =
-             '<ul><li *ngFor="let item of [1,2,3] as items; index as i">{{i}}/{{items.length}} - {{item}};</li></ul>';
+             '<ul><li *ngFor="let item of items as collection; index as i">{{i}}/{{collection.length}} - {{item}};</li></ul>';
          fixture = createTestComponent(template);
 
+         detectChangesAndExpectText('0/2 - 1;1/2 - 2;');
+
+         getComponent().items = [1, 2, 3];
          detectChangesAndExpectText('0/3 - 1;1/3 - 2;2/3 - 3;');
        }));
 
