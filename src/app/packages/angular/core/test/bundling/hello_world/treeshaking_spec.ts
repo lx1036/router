@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {withBody} from '@angular/core/testing';
+import {withBody} from '@angular/private/testing';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -29,7 +29,8 @@ describe('treeshaking with uglify', () => {
     expect(content).not.toContain('createCommonjsModule');
   });
 
-  it('should not contain zone.js', () => { expect(content).not.toContain('scheduleMicroTask'); });
+  it('should not contain zone.js',
+     () => { expect(content).not.toContain('global[\'Zone\'] = Zone'); });
 
   describe('functional test in domino', () => {
     it('should render hello world when not minified',

@@ -13,11 +13,11 @@ import {TemplateRef} from '../linker/template_ref';
 import {ViewContainerRef} from '../linker/view_container_ref';
 import {Renderer as RendererV1, Renderer2} from '../render/api';
 import {stringify} from '../util';
+import {isObservable} from '../util/lang';
 
 import {createChangeDetectorRef, createInjector, createRendererV1} from './refs';
 import {BindingDef, BindingFlags, DepDef, DepFlags, NodeDef, NodeFlags, OutputDef, OutputType, ProviderData, QueryValueType, Services, ViewData, ViewFlags, ViewState, asElementData, asProviderData, shouldCallLifecycleInitHook} from './types';
 import {calcBindingFlags, checkBinding, dispatchEvent, isComponentView, splitDepsDsl, splitMatchedQueriesDsl, tokenKey, viewParentEl} from './util';
-import {NgModel} from '@angular/forms';
 
 const RendererV1TokenKey = tokenKey(RendererV1);
 const Renderer2TokenKey = tokenKey(Renderer2);
@@ -138,9 +138,15 @@ export function createDirectiveInstance(view: ViewData, def: NodeDef): any {
   if (def.outputs.length) {
     for (let i = 0; i < def.outputs.length; i++) {
       const output = def.outputs[i];
-      const subscription = instance[output.propName !].subscribe(
-          eventHandlerClosure(view, def.parent !.nodeIndex, output.eventName));
-      view.disposables ![def.outputIndex + i] = subscription.unsubscribe.bind(subscription);
+      const outputObservable = instance[output.propName !];
+      if (isObservable(outputObservable)) {
+        const subscription = outputObservable.subscribe(
+            eventHandlerClosure(view, def.parent !.nodeIndex, output.eventName));
+        view.disposables ![def.outputIndex + i] = subscription.unsubscribe.bind(subscription);
+      } else {
+        throw new Error(
+            `@Output ${output.propName} not initialized in '${instance.constructor.name}'.`);
+      }
     }
   }
   return instance;
@@ -276,8 +282,6 @@ function createClass(
       for (let i = 0; i < len; i++) {
         depValues[i] = resolveDep(view, elDef, allowPrivateServices, deps[i]);
       }
-
-      // console.log(...depValues);
       return new ctor(...depValues);
   }
 }

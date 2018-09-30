@@ -10,13 +10,13 @@ import {AnimationEvent} from '@angular/animations';
 import {MockAnimationDriver, MockAnimationPlayer} from '@angular/animations/browser/testing';
 
 import {RendererType2, ViewEncapsulation} from '../../src/core';
-import {defineComponent, detectChanges} from '../../src/render3/index';
-import {bind, elementEnd, elementProperty, elementStart, listener, text, tick} from '../../src/render3/instructions';
+import {defineComponent} from '../../src/render3/index';
+import {bind, container, containerRefreshEnd, containerRefreshStart, element, elementEnd, elementProperty, elementStart, embeddedViewEnd, embeddedViewStart, listener, text, tick} from '../../src/render3/instructions';
 import {RenderFlags} from '../../src/render3/interfaces/definition';
 import {createRendererType2} from '../../src/view/index';
 
 import {getAnimationRendererFactory2, getRendererFactory2} from './imported_renderer2';
-import {containerEl, document, renderComponent, renderToHtml, toHtml} from './render_util';
+import {TemplateFixture, containerEl, document, renderComponent, renderToHtml, toHtml} from './render_util';
 
 describe('renderer factory lifecycle', () => {
   let logs: string[] = [];
@@ -32,7 +32,10 @@ describe('renderer factory lifecycle', () => {
   class SomeComponent {
     static ngComponentDef = defineComponent({
       type: SomeComponent,
+      encapsulation: ViewEncapsulation.None,
       selectors: [['some-component']],
+      consts: 1,
+      vars: 0,
       template: function(rf: RenderFlags, ctx: SomeComponent) {
         logs.push('component');
         if (rf & RenderFlags.Create) {
@@ -46,7 +49,10 @@ describe('renderer factory lifecycle', () => {
   class SomeComponentWhichThrows {
     static ngComponentDef = defineComponent({
       type: SomeComponentWhichThrows,
+      encapsulation: ViewEncapsulation.None,
       selectors: [['some-component-with-Error']],
+      consts: 0,
+      vars: 0,
       template: function(rf: RenderFlags, ctx: SomeComponentWhichThrows) {
         throw(new Error('SomeComponentWhichThrows threw'));
       },
@@ -67,8 +73,7 @@ describe('renderer factory lifecycle', () => {
     logs.push('function_with_component');
     if (rf & RenderFlags.Create) {
       text(0, 'bar');
-      elementStart(1, 'some-component');
-      elementEnd();
+      element(1, 'some-component');
     }
   }
 
@@ -89,7 +94,7 @@ describe('renderer factory lifecycle', () => {
   });
 
   it('should work with a template', () => {
-    renderToHtml(Template, {}, null, null, rendererFactory);
+    renderToHtml(Template, {}, 1, 0, null, null, rendererFactory);
     expect(logs).toEqual(['create', 'begin', 'function', 'end']);
 
     logs = [];
@@ -98,12 +103,12 @@ describe('renderer factory lifecycle', () => {
   });
 
   it('should work with a template which contains a component', () => {
-    renderToHtml(TemplateWithComponent, {}, directives, null, rendererFactory);
+    renderToHtml(TemplateWithComponent, {}, 2, 0, directives, null, rendererFactory);
     expect(logs).toEqual(
         ['create', 'begin', 'function_with_component', 'create', 'component', 'end']);
 
     logs = [];
-    renderToHtml(TemplateWithComponent, {}, directives);
+    renderToHtml(TemplateWithComponent, {}, 2, 0, directives);
     expect(logs).toEqual(['begin', 'function_with_component', 'component', 'end']);
   });
 
@@ -125,7 +130,10 @@ describe('animation renderer factory', () => {
   class SomeComponent {
     static ngComponentDef = defineComponent({
       type: SomeComponent,
+      encapsulation: ViewEncapsulation.None,
       selectors: [['some-component']],
+      consts: 1,
+      vars: 0,
       template: function(rf: RenderFlags, ctx: SomeComponent) {
         if (rf & RenderFlags.Create) {
           text(0, 'foo');
@@ -136,13 +144,16 @@ describe('animation renderer factory', () => {
   }
 
   class SomeComponentWithAnimation {
-    exp: string;
+    // TODO(issue/24571): remove '!'.
+    exp !: string;
     callback(event: AnimationEvent) {
       eventLogs.push(`${event.fromState ? event.fromState : event.toState} - ${event.phaseName}`);
     }
     static ngComponentDef = defineComponent({
       type: SomeComponentWithAnimation,
       selectors: [['some-component']],
+      consts: 2,
+      vars: 1,
       template: function(rf: RenderFlags, ctx: SomeComponentWithAnimation) {
         if (rf & RenderFlags.Create) {
           elementStart(0, 'div');
@@ -158,24 +169,22 @@ describe('animation renderer factory', () => {
         }
       },
       factory: () => new SomeComponentWithAnimation,
-      rendererType: createRendererType2({
-        encapsulation: ViewEncapsulation.None,
-        styles: [],
-        data: {
-          animation: [{
-            type: 7,
-            name: 'myAnimation',
-            definitions: [{
-              type: 1,
-              expr: '* => on',
-              animation:
-                  [{type: 4, styles: {type: 6, styles: {opacity: 1}, offset: null}, timings: 10}],
-              options: null
-            }],
-            options: {}
-          }]
-        }
-      }),
+      encapsulation: ViewEncapsulation.None,
+      styles: [],
+      data: {
+        animation: [{
+          type: 7,
+          name: 'myAnimation',
+          definitions: [{
+            type: 1,
+            expr: '* => on',
+            animation:
+                [{type: 4, styles: {type: 6, styles: {opacity: 1}, offset: null}, timings: 10}],
+            options: null
+          }],
+          options: {}
+        }]
+      },
     });
   }
 
@@ -204,5 +213,102 @@ describe('animation renderer factory', () => {
       expect(eventLogs).toEqual(['void - start', 'void - done', 'on - start', 'on - done']);
       done();
     });
+  });
+});
+
+describe('Renderer2 destruction hooks', () => {
+  const rendererFactory = getRendererFactory2(document);
+
+  it('should call renderer.destroyNode for each node destroyed', () => {
+    let condition = true;
+
+    function createTemplate() {
+      elementStart(0, 'div');
+      { container(1); }
+      elementEnd();
+    }
+
+    function updateTemplate() {
+      containerRefreshStart(1);
+      {
+        if (condition) {
+          let rf1 = embeddedViewStart(1, 3, 0);
+          {
+            if (rf1 & RenderFlags.Create) {
+              element(0, 'span');
+              element(1, 'span');
+              element(2, 'span');
+            }
+          }
+          embeddedViewEnd();
+        }
+      }
+      containerRefreshEnd();
+    }
+
+    const t = new TemplateFixture(
+        createTemplate, updateTemplate, 2, 0, null, null, null, rendererFactory);
+
+    expect(t.html).toEqual('<div><span></span><span></span><span></span></div>');
+
+    condition = false;
+    t.update();
+    expect(t.html).toEqual('<div></div>');
+    expect(ngDevMode).toHaveProperties({rendererDestroy: 0, rendererDestroyNode: 3});
+  });
+
+  it('should call renderer.destroy for each component destroyed', () => {
+    class SimpleComponent {
+      static ngComponentDef = defineComponent({
+        type: SimpleComponent,
+        encapsulation: ViewEncapsulation.None,
+        selectors: [['simple']],
+        consts: 1,
+        vars: 0,
+        template: function(rf: RenderFlags, ctx: SimpleComponent) {
+          if (rf & RenderFlags.Create) {
+            element(0, 'span');
+          }
+        },
+        factory: () => new SimpleComponent,
+      });
+    }
+
+    let condition = true;
+
+    function createTemplate() {
+      elementStart(0, 'div');
+      { container(1); }
+      elementEnd();
+    }
+
+    function updateTemplate() {
+      containerRefreshStart(1);
+      {
+        if (condition) {
+          let rf1 = embeddedViewStart(1, 3, 0);
+          {
+            if (rf1 & RenderFlags.Create) {
+              element(0, 'simple');
+              element(1, 'span');
+              element(2, 'simple');
+            }
+          }
+          embeddedViewEnd();
+        }
+      }
+      containerRefreshEnd();
+    }
+
+    const t = new TemplateFixture(
+        createTemplate, updateTemplate, 2, 0, [SimpleComponent], null, null, rendererFactory);
+
+    expect(t.html).toEqual(
+        '<div><simple><span></span></simple><span></span><simple><span></span></simple></div>');
+
+    condition = false;
+    t.update();
+    expect(t.html).toEqual('<div></div>');
+    expect(ngDevMode).toHaveProperties({rendererDestroy: 2, rendererDestroyNode: 3});
   });
 });

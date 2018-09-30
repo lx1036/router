@@ -8,13 +8,13 @@
 
 import {Type} from '../type';
 import {stringify} from '../util';
+import {getClosureSafeProperty} from '../util/property';
 
-import {InjectableDef, defineInjectable} from './defs';
+import {InjectableDef, defineInjectable, getInjectableDef} from './defs';
 import {resolveForwardRef} from './forward_ref';
 import {InjectionToken} from './injection_token';
 import {Inject, Optional, Self, SkipSelf} from './metadata';
 import {ConstructorProvider, ExistingProvider, FactoryProvider, StaticClassProvider, StaticProvider, ValueProvider} from './provider';
-import {computeMsgId} from "@angular/compiler/src/i18n/digest";
 
 export const SOURCE = '__source';
 const _THROW_IF_NOT_FOUND = new Object();
@@ -33,6 +33,10 @@ export const INJECTOR = new InjectionToken<Injector>('INJECTOR');
 export class NullInjector implements Injector {
   get(token: any, notFoundValue: any = _THROW_IF_NOT_FOUND): any {
     if (notFoundValue === _THROW_IF_NOT_FOUND) {
+      // Intentionally left behind: With dev tools open the debugger will stop here. There is no
+      // reason why correctly written application should cause this exception.
+      // TODO(misko): uncomment the next line once `ngDevMode` works with closure.
+      // if(ngDevMode) debugger;
       throw new Error(`NullInjectorError: No provider for ${stringify(token)}!`);
     }
     return notFoundValue;
@@ -40,23 +44,17 @@ export class NullInjector implements Injector {
 }
 
 /**
- * @usageNotes
- * ```
- * const injector: Injector = ...;
- * injector.get(...);
- * ```
- *
- * @description
- *
  * Concrete injectors implement this interface.
  *
- * For more details, see the {@linkDocs guide/dependency-injection "Dependency Injection Guide"}.
+ * For more details, see the ["Dependency Injection Guide"](guide/dependency-injection).
  *
+ * @usageNotes
  * ### Example
  *
  * {@example core/di/ts/injector_spec.ts region='Injector'}
  *
  * `Injector` returns itself when given `Injector` as a token:
+ *
  * {@example core/di/ts/injector_spec.ts region='injectInjector'}
  *
  *
@@ -67,10 +65,8 @@ export abstract class Injector {
 
   /**
    * Retrieves an instance from the injector based on the provided token.
-   * If not found:
-   * - Throws an error if no `notFoundValue` that is not equal to
-   * Injector.THROW_IF_NOT_FOUND is given
-   * - Returns the `notFoundValue` otherwise
+   * @returns The instance from the injector if defined, otherwise the `notFoundValue`.
+   * @throws When the `notFoundValue` is `undefined` or `Injector.THROW_IF_NOT_FOUND`.
    */
   abstract get<T>(token: Type<T>|InjectionToken<T>, notFoundValue?: T, flags?: InjectFlags): T;
   /**
@@ -89,6 +85,7 @@ export abstract class Injector {
   /**
    * Create a new Injector which is configure using `StaticProvider`s.
    *
+   * @usageNotes
    * ### Example
    *
    * {@example core/di/ts/provider_spec.ts region='ConstructorProvider'}
@@ -119,9 +116,8 @@ const CIRCULAR = IDENT;
 const MULTI_PROVIDER_FN = function(): any[] {
   return Array.prototype.slice.call(arguments);
 };
-const GET_PROPERTY_NAME = {} as any;
 export const USE_VALUE =
-    getClosureSafeProperty<ValueProvider>({provide: String, useValue: GET_PROPERTY_NAME});
+    getClosureSafeProperty<ValueProvider>({provide: String, useValue: getClosureSafeProperty});
 const NG_TOKEN_PATH = 'ngTokenPath';
 const NG_TEMP_TOKEN_PATH = 'ngTempTokenPath';
 const enum OptionFlags {
@@ -149,7 +145,6 @@ export class StaticInjector implements Injector {
         Injector, <Record>{token: Injector, fn: IDENT, deps: EMPTY, value: this, useNew: false});
     records.set(
         INJECTOR, <Record>{token: INJECTOR, fn: IDENT, deps: EMPTY, value: this, useNew: false});
-    // process providers
     recursivelyProcessProviders(records, providers);
   }
 
@@ -227,8 +222,6 @@ function multiProviderMixError(token: any) {
 }
 
 function recursivelyProcessProviders(records: Map<any, Record>, provider: StaticProvider) {
-  // console.log(provider);
-
   if (provider) {
     provider = resolveForwardRef(provider);
     if (provider instanceof Array) {
@@ -244,7 +237,6 @@ function recursivelyProcessProviders(records: Map<any, Record>, provider: Static
       // At this point we have what looks like a provider: {provide: ?, ....}
       let token = resolveForwardRef(provider.provide);
       const resolvedProvider = resolveProvider(provider);
-
       if (provider.multi === true) {
         // This is a multi provider.
         let multiProvider: Record|undefined = records.get(token);
@@ -266,12 +258,11 @@ function recursivelyProcessProviders(records: Map<any, Record>, provider: Static
         token = provider;
         multiProvider.deps.push({token, options: OptionFlags.Default});
       }
-
       const record = records.get(token);
       if (record && record.fn == MULTI_PROVIDER_FN) {
         throw multiProviderMixError(token);
       }
-      records.set(token, resolvedProvider); // resolvedProvider: Record
+      records.set(token, resolvedProvider);
     } else {
       throw staticError('Unexpected provider', provider);
     }
@@ -348,10 +339,8 @@ function resolveToken(
 
 function computeDeps(provider: StaticProvider): DependencyRecord[] {
   let deps: DependencyRecord[] = EMPTY;
-
   const providerDeps: any[] =
       (provider as ExistingProvider & StaticClassProvider & ConstructorProvider).deps;
-
   if (providerDeps && providerDeps.length) {
     deps = [];
     for (let i = 0; i < providerDeps.length; i++) {
@@ -408,32 +397,23 @@ function staticError(text: string, obj: any): Error {
   return new Error(formatError(text, obj));
 }
 
-function getClosureSafeProperty<T>(objWithPropertyToExtract: T): string {
-  for (let key in objWithPropertyToExtract) {
-    if (objWithPropertyToExtract[key] === GET_PROPERTY_NAME) {
-      return key;
-    }
-  }
-  throw Error('!prop');
-}
-
 /**
  * Injection flags for DI.
  */
 export const enum InjectFlags {
-  Default = 0,
+  Default = 0b0000,
 
   /**
    * Specifies that an injector should retrieve a dependency from any injector until reaching the
    * host element of the current component. (Only used with Element Injector)
    */
-  Host = 1 << 0,
+  Host = 0b0001,
   /** Don't descend into ancestors of the node requesting injection. */
-  Self = 1 << 1,
+  Self = 0b0010,
   /** Skip the node that is requesting injection. */
-  SkipSelf = 1 << 2,
+  SkipSelf = 0b0100,
   /** Inject `defaultValue` instead if token not found. */
-  Optional = 1 << 3,
+  Optional = 0b1000,
 }
 
 /**
@@ -454,7 +434,10 @@ export function setCurrentInjector(injector: Injector | null | undefined): Injec
  * Injects a token from the currently active injector.
  *
  * This function must be used in the context of a factory function such as one defined for an
- * `InjectionToken`, and will throw an error if not called from such a context. For example:
+ * `InjectionToken`, and will throw an error if not called from such a context.
+ *
+ * @usageNotes
+ * ### Example
  *
  * {@example core/di/ts/injector_spec.ts region='ShakeableInjectionToken'}
  *
@@ -470,11 +453,12 @@ export function inject<T>(token: Type<T>| InjectionToken<T>, flags = InjectFlags
   if (_currentInjector === undefined) {
     throw new Error(`inject() must be called from an injection context`);
   } else if (_currentInjector === null) {
-    const injectableDef: InjectableDef<T> = (token as any).ngInjectableDef;
+    const injectableDef: InjectableDef<T>|null = getInjectableDef(token);
     if (injectableDef && injectableDef.providedIn == 'root') {
       return injectableDef.value === undefined ? injectableDef.value = injectableDef.factory() :
                                                  injectableDef.value;
     }
+    if (flags & InjectFlags.Optional) return null;
     throw new Error(`Injector: NOT_FOUND [${stringify(token)}]`);
   } else {
     return _currentInjector.get(token, flags & InjectFlags.Optional ? null : undefined, flags);
@@ -494,11 +478,11 @@ export function injectArgs(types: (Type<any>| InjectionToken<any>| any[])[]): an
 
       for (let j = 0; j < arg.length; j++) {
         const meta = arg[j];
-        if (meta instanceof Optional || meta.__proto__.ngMetadataName === 'Optional') {
+        if (meta instanceof Optional || meta.ngMetadataName === 'Optional') {
           flags |= InjectFlags.Optional;
-        } else if (meta instanceof SkipSelf || meta.__proto__.ngMetadataName === 'SkipSelf') {
+        } else if (meta instanceof SkipSelf || meta.ngMetadataName === 'SkipSelf') {
           flags |= InjectFlags.SkipSelf;
-        } else if (meta instanceof Self || meta.__proto__.ngMetadataName === 'Self') {
+        } else if (meta instanceof Self || meta.ngMetadataName === 'Self') {
           flags |= InjectFlags.Self;
         } else if (meta instanceof Inject) {
           type = meta.token;

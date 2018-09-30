@@ -6,13 +6,16 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {Injectable, InjectionToken, StaticProvider} from '../di';
+import {Injectable} from '../di/injectable';
+import {InjectionToken} from '../di/injection_token';
+import {StaticProvider} from '../di/provider';
 import {MissingTranslationStrategy} from '../i18n/tokens';
 import {ViewEncapsulation} from '../metadata';
 import {Type} from '../type';
 
 import {ComponentFactory} from './component_factory';
 import {NgModuleFactory} from './ng_module_factory';
+
 
 
 /**
@@ -78,6 +81,11 @@ export class Compiler {
    * Clears the cache for the given component/ngModule.
    */
   clearCacheFor(type: Type<any>) {}
+
+  /**
+   * Returns the id for a given NgModule, if one is defined and known to the compiler.
+   */
+  getModuleId(moduleType: Type<any>): string|undefined { return undefined; }
 }
 
 /**
