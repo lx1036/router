@@ -48,6 +48,7 @@ import {BrowserAnimationsModule} from './packages/angular/platform-browser/anima
 import {animate, animateChild, group, query, sequence, stagger, style, transition, trigger} from '@angular/animations';
 import {Location} from '@angular/common';
 import {AddressComp, AddressComponent, PersonInfoComp, PersonNestedForm} from './nested-form';
+import {DemoModuleLoaderModule} from "./demo/module-loader/module-loader";
 
 
 @Component({
@@ -422,14 +423,16 @@ export class ForbiddenValidator implements Validator{
 
     <!--<input type="email" name="email" ngModel email required>-->
     
-    <person-nested-from></person-nested-from>
+    <!--<person-nested-from></person-nested-from>-->
+    
+    <demo-module-loader></demo-module-loader>
     
   `,
   styles: [
     `
-        .ng-invalid {
-            border: 2px solid red;
-        }
+      .ng-invalid {
+        border: 2px solid #ff0000;
+      }
     `
   ]
 })
@@ -512,6 +515,9 @@ export class FormComp implements OnInit {
     // !environment.production ? StoreDevtoolsModule.instrument() : [],
     // StoreRouterConnectingModule.forRoot({stateKey: 'routerState'}),
     // EffectsModule.forRoot([UserEffects, AuthEffects]),
+
+
+    DemoModuleLoaderModule,
   ],
   providers: [
     AuthService,

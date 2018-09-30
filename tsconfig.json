@@ -29,7 +29,7 @@
       "@angular/cdk/platform": ["src/app/packages/angular/cdk/platform"],
       "@angular/cdk/collections": ["src/app/packages/angular/cdk/collections"],
       "@angular/cdk/layout": ["src/app/packages/angular/cdk/layout"],
-      "@angular/material/core": ["src/app/packages/angular/material/core"]
+      "@angular/material/*": ["src/app/packages/angular/material/*"]
     },
     "outDir": "./dist/out-tsc",
     "sourceMap": true,

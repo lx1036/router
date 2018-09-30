@@ -47,6 +47,9 @@ export class MatGridList implements OnInit, AfterContentChecked {
   /** Number of columns being rendered. */
   private _cols: number;
 
+  /** Used for determiningthe position of each tile in the grid. */
+  private _tileCoordinator: TileCoordinator;
+
   /**
    * Row height value passed in by user. This can be one of three types:
    * - Number value (ex: "100px"):  sets a fixed row height to that value
@@ -70,7 +73,9 @@ export class MatGridList implements OnInit, AfterContentChecked {
   /** Amount of columns in the grid list. */
   @Input()
   get cols(): number { return this._cols; }
-  set cols(value: number) { this._cols = Math.round(coerceNumberProperty(value)); }
+  set cols(value: number) {
+    this._cols = Math.max(1, Math.round(coerceNumberProperty(value)));
+  }
 
   /** Size of the grid list's gutter in pixels. */
   @Input()
@@ -133,8 +138,14 @@ export class MatGridList implements OnInit, AfterContentChecked {
 
   /** Computes and applies the size and position for all children grid tiles. */
   private _layoutTiles(): void {
-    const tracker = new TileCoordinator(this.cols, this._tiles);
+    if (!this._tileCoordinator) {
+      this._tileCoordinator = new TileCoordinator(this._tiles);
+    }
+
+    const tracker = this._tileCoordinator;
     const direction = this._dir ? this._dir.value : 'ltr';
+
+    this._tileCoordinator.update(this.cols);
     this._tileStyler.init(this.gutterSize, tracker, this.cols, direction);
 
     this._tiles.forEach((tile, index) => {

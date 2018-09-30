@@ -44,7 +44,7 @@ import {FocusTrap, FocusTrapFactory} from '@angular/cdk/a11y';
   moduleId: module.id,
   selector: 'mat-bottom-sheet-container',
   templateUrl: 'bottom-sheet-container.html',
-  styleUrls: ['bottom-sheet-container.scss'],
+  styleUrls: ['bottom-sheet-container.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   animations: [matBottomSheetAnimations.bottomSheetState],
@@ -84,7 +84,7 @@ export class MatBottomSheetContainer extends BasePortalOutlet implements OnDestr
   private _destroyed: boolean;
 
   constructor(
-    private _elementRef: ElementRef,
+    private _elementRef: ElementRef<HTMLElement>,
     private _changeDetectorRef: ChangeDetectorRef,
     private _focusTrapFactory: FocusTrapFactory,
     breakpointObserver: BreakpointObserver,

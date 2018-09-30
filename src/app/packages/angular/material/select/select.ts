@@ -26,8 +26,8 @@ import {
   Overlay,
   RepositionScrollStrategy,
   ScrollStrategy,
-  ViewportRuler,
 } from '@angular/cdk/overlay';
+import {ViewportRuler} from '@angular/cdk/scrolling';
 import {
   AfterContentInit,
   Attribute,
@@ -117,15 +117,17 @@ export const SELECT_PANEL_INDENT_PADDING_X = SELECT_PANEL_PADDING_X * 2;
 /** The height of the select items in `em` units. */
 export const SELECT_ITEM_HEIGHT_EM = 3;
 
+// TODO(josephperrott): Revert to a constant after 2018 spec updates are fully merged.
 /**
  * Distance between the panel edge and the option text in
  * multi-selection mode.
  *
+ * Calculated as:
  * (SELECT_PANEL_PADDING_X * 1.5) + 20 = 44
  * The padding is multiplied by 1.5 because the checkbox's margin is half the padding.
- * The checkbox width is 20px.
+ * The checkbox width is 16px.
  */
-export const SELECT_MULTIPLE_PANEL_PADDING_X = SELECT_PANEL_PADDING_X * 1.5 + 20;
+export let SELECT_MULTIPLE_PANEL_PADDING_X = 0;
 
 /**
  * The select panel will only "fit" inside the viewport if it is positioned at
@@ -218,8 +220,7 @@ export class MatSelectTrigger {}
     '(blur)': '_onBlur()',
   },
   animations: [
-    matSelectAnimations.transformPanel,
-    matSelectAnimations.fadeInContent
+    matSelectAnimations.transformPanel
   ],
   providers: [
     {provide: MatFormFieldControl, useExisting: MatSelect},
@@ -279,9 +280,6 @@ export class MatSelect extends _MatSelectMixinBase implements AfterContentInit, 
 
   /** The value of the select panel's transform-origin property. */
   _transformOrigin: string = 'top';
-
-  /** Whether the panel's animation is done. */
-  _panelDoneAnimating: boolean = false;
 
   /** Emits when the panel element is finished transforming in. */
   _panelDoneAnimatingStream = new Subject<string>();
@@ -520,7 +518,6 @@ export class MatSelect extends _MatSelectMixinBase implements AfterContentInit, 
           this.openedChange.emit(true);
         } else {
           this.openedChange.emit(false);
-          this._panelDoneAnimating = false;
           this.overlayDir.offsetX = 0;
           this._changeDetectorRef.markForCheck();
         }
@@ -743,15 +740,6 @@ export class MatSelect extends _MatSelectMixinBase implements AfterContentInit, 
     }
   }
 
-  /**
-   * When the panel content is done fading in, the _panelDoneAnimating property is
-   * set so the proper class can be added to the panel.
-   */
-  _onFadeInDone(): void {
-    this._panelDoneAnimating = this.panelOpen;
-    this._changeDetectorRef.markForCheck();
-  }
-
   _onFocus() {
     if (!this.disabled) {
       this._focused = true;
@@ -778,6 +766,7 @@ export class MatSelect extends _MatSelectMixinBase implements AfterContentInit, 
    */
   _onAttached(): void {
     this.overlayDir.positionChange.pipe(take(1)).subscribe(() => {
+      this._setPseudoCheckboxPaddingSize();
       this._changeDetectorRef.detectChanges();
       this._calculateOverlayOffsetX();
       this.panel.nativeElement.scrollTop = this._scrollTop;
@@ -787,6 +776,17 @@ export class MatSelect extends _MatSelectMixinBase implements AfterContentInit, 
   /** Returns the theme to be used on the panel. */
   _getPanelTheme(): string {
     return this._parentFormField ? `mat-${this._parentFormField.color}` : '';
+  }
+
+  // TODO(josephperrott): Remove after 2018 spec updates are fully merged.
+  /** Sets the pseudo checkbox padding size based on the width of the pseudo checkbox. */
+  private _setPseudoCheckboxPaddingSize() {
+    if (!SELECT_MULTIPLE_PANEL_PADDING_X && this.multiple) {
+      const pseudoCheckbox = this.panel.nativeElement.querySelector('.mat-pseudo-checkbox');
+      if (pseudoCheckbox) {
+        SELECT_MULTIPLE_PANEL_PADDING_X = SELECT_PANEL_PADDING_X * 1.5 + pseudoCheckbox.offsetWidth;
+      }
+    }
   }
 
   /** Whether the select has a value. */

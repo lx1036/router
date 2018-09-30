@@ -64,7 +64,6 @@ export class SystemJsNgModuleLoader implements NgModuleFactoryLoader {
       exportName = 'default';
     }
 
-
     return System.import(module)
         .then((module: any) => module[exportName])
         .then((type: any) => checkNotEmpty(type, module, exportName))
