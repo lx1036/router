@@ -8,22 +8,25 @@
 
 import {CommonModule, Location} from '@angular/common';
 import {SpyLocation} from '@angular/common/testing';
-import {ChangeDetectionStrategy, Component, Injectable, NgModule, NgModuleFactoryLoader, NgModuleRef} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Injectable, NgModule, NgModuleFactoryLoader, NgModuleRef, NgZone, OnDestroy, ɵConsole as Console, ɵNoopNgZone as NoopNgZone} from '@angular/core';
 import {ComponentFixture, TestBed, fakeAsync, inject, tick} from '@angular/core/testing';
 import {By} from '@angular/platform-browser/src/dom/debug/by';
 import {expect} from '@angular/platform-browser/testing/src/matchers';
-import {ActivatedRoute, ActivatedRouteSnapshot, ActivationEnd, ActivationStart, CanActivate, CanDeactivate, ChildActivationEnd, ChildActivationStart, DetachedRouteHandle, Event, GuardsCheckEnd, GuardsCheckStart, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, PRIMARY_OUTLET, ParamMap, Params, PreloadAllModules, PreloadingStrategy, Resolve, ResolveEnd, ResolveStart, RouteConfigLoadEnd, RouteConfigLoadStart, RouteReuseStrategy, Router, RouterEvent, RouterModule, RouterPreloader, RouterStateSnapshot, RoutesRecognized, RunGuardsAndResolvers, UrlHandlingStrategy, UrlSegmentGroup, UrlTree} from '@angular/router';
-import {Observable, Observer, of } from 'rxjs';
-import {map} from 'rxjs/operators';
+import {ActivatedRoute, ActivatedRouteSnapshot, ActivationEnd, ActivationStart, CanActivate, CanDeactivate, ChildActivationEnd, ChildActivationStart, DetachedRouteHandle, Event, GuardsCheckEnd, GuardsCheckStart, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, PRIMARY_OUTLET, ParamMap, Params, PreloadAllModules, PreloadingStrategy, Resolve, ResolveEnd, ResolveStart, RouteConfigLoadEnd, RouteConfigLoadStart, RouteReuseStrategy, Router, RouterEvent, RouterModule, RouterPreloader, RouterStateSnapshot, RoutesRecognized, RunGuardsAndResolvers, UrlHandlingStrategy, UrlSegmentGroup, UrlSerializer, UrlTree} from '@angular/router';
+import {Observable, Observer, Subscription, of } from 'rxjs';
+import {filter, first, map, tap} from 'rxjs/operators';
 
 import {forEach} from '../src/utils/collection';
 import {RouterTestingModule, SpyNgModuleFactoryLoader} from '../testing';
 
 describe('Integration', () => {
+  const noopConsole: Console = {log() {}, warn() {}};
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports:
-          [RouterTestingModule.withRoutes([{path: 'simple', component: SimpleCmp}]), TestModule]
+          [RouterTestingModule.withRoutes([{path: 'simple', component: SimpleCmp}]), TestModule],
+      providers: [{provide: Console, useValue: noopConsole}]
     });
   });
 
@@ -154,6 +157,50 @@ describe('Integration', () => {
        })));
   });
 
+  describe('navigation warning', () => {
+    let warnings: string[] = [];
+
+    class MockConsole {
+      warn(message: string) { warnings.push(message); }
+    }
+
+    beforeEach(() => {
+      warnings = [];
+      TestBed.overrideProvider(Console, {useValue: new MockConsole()});
+    });
+
+    describe('with NgZone enabled', () => {
+      it('should warn when triggered outside Angular zone',
+         fakeAsync(inject([Router, NgZone], (router: Router, ngZone: NgZone) => {
+           ngZone.runOutsideAngular(() => { router.navigateByUrl('/simple'); });
+
+           expect(warnings.length).toBe(1);
+           expect(warnings[0])
+               .toBe(
+                   `Navigation triggered outside Angular zone, did you forget to call 'ngZone.run()'?`);
+         })));
+
+      it('should not warn when triggered inside Angular zone',
+         fakeAsync(inject([Router, NgZone], (router: Router, ngZone: NgZone) => {
+           ngZone.run(() => { router.navigateByUrl('/simple'); });
+
+           expect(warnings.length).toBe(0);
+         })));
+    });
+
+    describe('with NgZone disabled', () => {
+      beforeEach(() => { TestBed.overrideProvider(NgZone, {useValue: new NoopNgZone()}); });
+
+      it('should not warn when triggered outside Angular zone',
+         fakeAsync(inject([Router, NgZone], (router: Router, ngZone: NgZone) => {
+
+           ngZone.runOutsideAngular(() => { router.navigateByUrl('/simple'); });
+
+           expect(warnings.length).toBe(0);
+         })));
+    });
+  });
+
   describe('should execute navigations serially', () => {
     let log: any[] = [];
 
@@ -187,8 +234,6 @@ describe('Integration', () => {
     });
 
     describe('should advance the parent route after deactivating its children', () => {
-      let log: string[] = [];
-
       @Component({template: '<router-outlet></router-outlet>'})
       class Parent {
         constructor(route: ActivatedRoute) {
@@ -214,10 +259,7 @@ describe('Integration', () => {
       class TestModule {
       }
 
-      beforeEach(() => {
-        log = [];
-        TestBed.configureTestingModule({imports: [TestModule]});
-      });
+      beforeEach(() => TestBed.configureTestingModule({imports: [TestModule]}));
 
       it('should work',
          fakeAsync(inject([Router, Location], (router: Router, location: Location) => {
@@ -249,7 +291,7 @@ describe('Integration', () => {
 
     });
 
-    it('should execute navigations serialy',
+    it('should not wait for prior navigations to start a new navigation',
        fakeAsync(inject([Router, Location], (router: Router) => {
          const fixture = createRoot(router, RootCmp);
 
@@ -266,23 +308,17 @@ describe('Integration', () => {
          tick(100);  // 200
          fixture.detectChanges();
 
-         expect(log).toEqual(['trueRightAway', 'trueIn2Seconds-start']);
+         expect(log).toEqual(
+             ['trueRightAway', 'trueIn2Seconds-start', 'trueRightAway', 'trueIn2Seconds-start']);
 
          tick(2000);  // 2200
          fixture.detectChanges();
 
          expect(log).toEqual([
-           'trueRightAway', 'trueIn2Seconds-start', 'trueIn2Seconds-end', 'trueRightAway',
-           'trueIn2Seconds-start'
+           'trueRightAway', 'trueIn2Seconds-start', 'trueRightAway', 'trueIn2Seconds-start',
+           'trueIn2Seconds-end', 'trueIn2Seconds-end'
          ]);
 
-         tick(2000);  // 4200
-         fixture.detectChanges();
-
-         expect(log).toEqual([
-           'trueRightAway', 'trueIn2Seconds-start', 'trueIn2Seconds-end', 'trueRightAway',
-           'trueIn2Seconds-start', 'trueIn2Seconds-end'
-         ]);
        })));
   });
 
@@ -471,6 +507,31 @@ describe('Integration', () => {
 
        expect(location.path()).toEqual('/team/22');
 
+       expect(fixture.nativeElement).toHaveText('team 33 [ , right:  ]');
+     })));
+
+  it('should eagerly update the URL with urlUpdateStrategy="eagar"',
+     fakeAsync(inject([Router, Location], (router: Router, location: Location) => {
+       const fixture = TestBed.createComponent(RootCmp);
+       advance(fixture);
+
+       router.resetConfig([{path: 'team/:id', component: TeamCmp}]);
+
+       router.navigateByUrl('/team/22');
+       advance(fixture);
+       expect(location.path()).toEqual('/team/22');
+
+       expect(fixture.nativeElement).toHaveText('team 22 [ , right:  ]');
+
+       router.urlUpdateStrategy = 'eager';
+       (router as any).hooks.beforePreactivation = () => {
+         expect(location.path()).toEqual('/team/33');
+         expect(fixture.nativeElement).toHaveText('team 22 [ , right:  ]');
+         return of (null);
+       };
+       router.navigateByUrl('/team/33');
+
+       advance(fixture);
        expect(fixture.nativeElement).toHaveText('team 33 [ , right:  ]');
      })));
 
@@ -873,100 +934,105 @@ describe('Integration', () => {
        ]);
      })));
 
-  it('should dispatch NavigationError after the url has been reset back', fakeAsync(() => {
-       const router = TestBed.get(Router);
-       const location = TestBed.get(Location);
-       const fixture = createRoot(router, RootCmp);
+  // Errors should behave the same for both deferred and eager URL update strategies
+  ['deferred', 'eager'].forEach((strat: any) => {
+    it('should dispatch NavigationError after the url has been reset back', fakeAsync(() => {
+         const router: Router = TestBed.get(Router);
+         const location: SpyLocation = TestBed.get(Location);
+         const fixture = createRoot(router, RootCmp);
 
-       router.resetConfig(
-           [{path: 'simple', component: SimpleCmp}, {path: 'throwing', component: ThrowingCmp}]);
+         router.resetConfig(
+             [{path: 'simple', component: SimpleCmp}, {path: 'throwing', component: ThrowingCmp}]);
+         router.urlUpdateStrategy = strat;
 
-       router.navigateByUrl('/simple');
-       advance(fixture);
+         router.navigateByUrl('/simple');
+         advance(fixture);
 
-       let routerUrlBeforeEmittingError;
-       let locationUrlBeforeEmittingError;
-       router.events.forEach((e: any) => {
-         if (e instanceof NavigationError) {
-           routerUrlBeforeEmittingError = router.url;
-           locationUrlBeforeEmittingError = location.path();
-         }
-       });
+         let routerUrlBeforeEmittingError = '';
+         let locationUrlBeforeEmittingError = '';
+         router.events.forEach(e => {
+           if (e instanceof NavigationError) {
+             routerUrlBeforeEmittingError = router.url;
+             locationUrlBeforeEmittingError = location.path();
+           }
+         });
+         router.navigateByUrl('/throwing').catch(() => null);
+         advance(fixture);
 
-       router.navigateByUrl('/throwing').catch(() => null);
-       advance(fixture);
+         expect(routerUrlBeforeEmittingError).toEqual('/simple');
+         expect(locationUrlBeforeEmittingError).toEqual('/simple');
+       }));
 
-       expect(routerUrlBeforeEmittingError).toEqual('/simple');
-       expect(locationUrlBeforeEmittingError).toEqual('/simple');
-     }));
+    it('should reset the url with the right state when navigation errors', fakeAsync(() => {
+         const router: Router = TestBed.get(Router);
+         const location: SpyLocation = TestBed.get(Location);
+         const fixture = createRoot(router, RootCmp);
 
-  it('should reset the url with the right state when navigation errors', fakeAsync(() => {
-       const router: Router = TestBed.get(Router);
-       const location: SpyLocation = TestBed.get(Location);
-       const fixture = createRoot(router, RootCmp);
+         router.resetConfig([
+           {path: 'simple1', component: SimpleCmp}, {path: 'simple2', component: SimpleCmp},
+           {path: 'throwing', component: ThrowingCmp}
+         ]);
+         router.urlUpdateStrategy = strat;
 
-       router.resetConfig([
-         {path: 'simple1', component: SimpleCmp}, {path: 'simple2', component: SimpleCmp},
-         {path: 'throwing', component: ThrowingCmp}
-       ]);
+         let event: NavigationStart;
+         router.events.subscribe(e => {
+           if (e instanceof NavigationStart) {
+             event = e;
+           }
+         });
 
+         router.navigateByUrl('/simple1');
+         advance(fixture);
+         const simple1NavStart = event !;
 
-       let event: NavigationStart;
-       router.events.subscribe(e => {
-         if (e instanceof NavigationStart) {
-           event = e;
-         }
-       });
+         router.navigateByUrl('/throwing').catch(() => null);
+         advance(fixture);
 
-       router.navigateByUrl('/simple1');
-       advance(fixture);
-       const simple1NavStart = event !;
+         router.navigateByUrl('/simple2');
+         advance(fixture);
 
-       router.navigateByUrl('/throwing').catch(() => null);
-       advance(fixture);
+         location.back();
+         tick();
 
-       router.navigateByUrl('/simple2');
-       advance(fixture);
+         expect(event !.restoredState !.navigationId).toEqual(simple1NavStart.id);
+       }));
 
-       location.back();
-       tick();
+    it('should not trigger another navigation when resetting the url back due to a NavigationError',
+       fakeAsync(() => {
+         const router = TestBed.get(Router);
+         router.onSameUrlNavigation = 'reload';
 
-       expect(event !.restoredState !.navigationId).toEqual(simple1NavStart.id);
-     }));
+         const fixture = createRoot(router, RootCmp);
 
-  it('should not trigger another navigation when resetting the url back due to a NavigationError',
-     fakeAsync(() => {
-       const router = TestBed.get(Router);
-       router.onSameUrlNavigation = 'reload';
+         router.resetConfig(
+             [{path: 'simple', component: SimpleCmp}, {path: 'throwing', component: ThrowingCmp}]);
+         router.urlUpdateStrategy = strat;
 
-       const fixture = createRoot(router, RootCmp);
+         const events: any[] = [];
+         router.events.forEach((e: any) => {
+           if (e instanceof NavigationStart) {
+             events.push(e.url);
+           }
+         });
 
-       router.resetConfig(
-           [{path: 'simple', component: SimpleCmp}, {path: 'throwing', component: ThrowingCmp}]);
+         router.navigateByUrl('/simple');
+         advance(fixture);
 
-       const events: any[] = [];
-       router.events.forEach((e: any) => {
-         if (e instanceof NavigationStart) {
-           events.push(e.url);
-         }
-       });
+         router.navigateByUrl('/throwing').catch(() => null);
+         advance(fixture);
 
-       router.navigateByUrl('/simple');
-       advance(fixture);
+         // we do not trigger another navigation to /simple
+         expect(events).toEqual(['/simple', '/throwing']);
+       }));
 
-       router.navigateByUrl('/throwing').catch(() => null);
-       advance(fixture);
-
-       // we do not trigger another navigation to /simple
-       expect(events).toEqual(['/simple', '/throwing']);
-     }));
+  });
 
   it('should dispatch NavigationCancel after the url has been reset back', fakeAsync(() => {
        TestBed.configureTestingModule(
            {providers: [{provide: 'returnsFalse', useValue: () => false}]});
 
-       const router = TestBed.get(Router);
-       const location = TestBed.get(Location);
+       const router: Router = TestBed.get(Router);
+       const location: SpyLocation = TestBed.get(Location);
 
        const fixture = createRoot(router, RootCmp);
 
@@ -978,18 +1044,19 @@ describe('Integration', () => {
        router.navigateByUrl('/simple');
        advance(fixture);
 
-       let routerUrlBeforeEmittingError;
-       let locationUrlBeforeEmittingError;
-       router.events.forEach((e: any) => {
+       let routerUrlBeforeEmittingError = '';
+       let locationUrlBeforeEmittingError = '';
+       router.events.forEach(e => {
          if (e instanceof NavigationCancel) {
            routerUrlBeforeEmittingError = router.url;
            locationUrlBeforeEmittingError = location.path();
          }
        });
 
-       (<any>location).simulateHashChange('/throwing');
+       location.simulateHashChange('/throwing');
        advance(fixture);
 
+       expect(routerUrlBeforeEmittingError).toEqual('/simple');
        expect(locationUrlBeforeEmittingError).toEqual('/simple');
      }));
 
@@ -1008,6 +1075,30 @@ describe('Integration', () => {
        expect(e).toEqual('resolvedValue');
 
        expectEvents(recordedEvents, [[NavigationStart, '/invalid'], [NavigationError, '/invalid']]);
+     })));
+
+  it('should recover from malformed uri errors',
+     fakeAsync(inject([Router, Location], (router: Router, location: Location) => {
+       router.resetConfig([{path: 'simple', component: SimpleCmp}]);
+       const fixture = createRoot(router, RootCmp);
+       router.navigateByUrl('/invalid/url%with%percent');
+       advance(fixture);
+       expect(location.path()).toEqual('/');
+     })));
+
+  it('should support custom malformed uri error handler',
+     fakeAsync(inject([Router, Location], (router: Router, location: Location) => {
+       const customMalformedUriErrorHandler =
+           (e: URIError, urlSerializer: UrlSerializer, url: string):
+               UrlTree => { return urlSerializer.parse('/?error=The-URL-you-went-to-is-invalid'); };
+       router.malformedUriErrorHandler = customMalformedUriErrorHandler;
+
+       router.resetConfig([{path: 'simple', component: SimpleCmp}]);
+
+       const fixture = createRoot(router, RootCmp);
+       router.navigateByUrl('/invalid/url%with%percent');
+       advance(fixture);
+       expect(location.path()).toEqual('/?error=The-URL-you-went-to-is-invalid');
      })));
 
   it('should not swallow errors', fakeAsync(inject([Router], (router: Router) => {
@@ -2865,6 +2956,34 @@ describe('Integration', () => {
            [NavigationEnd, '/user/fedor']
          ]);
        })));
+
+    it('should allow redirection in NavigationStart',
+       fakeAsync(inject([Router], (router: Router) => {
+         const fixture = createRoot(router, RootCmp);
+
+         router.resetConfig([
+           {path: 'blank', component: UserCmp},
+           {path: 'user/:name', component: BlankCmp},
+         ]);
+
+         const navigateSpy = spyOn(router, 'navigate').and.callThrough();
+         const recordedEvents: any[] = [];
+
+         const navStart$ = router.events.pipe(
+             tap(e => recordedEvents.push(e)), filter(e => e instanceof NavigationStart), first());
+
+         navStart$.subscribe((e: NavigationStart | NavigationError) => {
+           router.navigate(
+               ['/blank'], {queryParams: {state: 'redirected'}, queryParamsHandling: 'merge'});
+           advance(fixture);
+         });
+
+         router.navigate(['/user/:fedor']);
+         advance(fixture);
+
+         expect(navigateSpy.calls.mostRecent().args[1].queryParams);
+
+       })));
   });
 
   describe('routerActiveLink', () => {
@@ -3366,6 +3485,72 @@ describe('Integration', () => {
              expect(location.path()).toEqual('/lazy2/loaded');
            })));
 
+    it('should allow lazy loaded module in named outlet',
+       fakeAsync(inject(
+           [Router, NgModuleFactoryLoader], (router: Router, loader: SpyNgModuleFactoryLoader) => {
+
+             @Component({selector: 'lazy', template: 'lazy-loaded'})
+             class LazyComponent {
+             }
+
+             @NgModule({
+               declarations: [LazyComponent],
+               imports: [RouterModule.forChild([{path: '', component: LazyComponent}])]
+             })
+             class LazyLoadedModule {
+             }
+
+             loader.stubbedModules = {lazyModule: LazyLoadedModule};
+
+             const fixture = createRoot(router, RootCmp);
+
+             router.resetConfig([{
+               path: 'team/:id',
+               component: TeamCmp,
+               children: [
+                 {path: 'user/:name', component: UserCmp},
+                 {path: 'lazy', loadChildren: 'lazyModule', outlet: 'right'},
+               ]
+             }]);
+
+
+             router.navigateByUrl('/team/22/user/john');
+             advance(fixture);
+
+             expect(fixture.nativeElement).toHaveText('team 22 [ user john, right:  ]');
+
+             router.navigateByUrl('/team/22/(user/john//right:lazy)');
+             advance(fixture);
+
+             expect(fixture.nativeElement).toHaveText('team 22 [ user john, right: lazy-loaded ]');
+           })));
+
+    it('should allow componentless named outlet to render children',
+       fakeAsync(inject(
+           [Router, NgModuleFactoryLoader], (router: Router, loader: SpyNgModuleFactoryLoader) => {
+
+             const fixture = createRoot(router, RootCmp);
+
+             router.resetConfig([{
+               path: 'team/:id',
+               component: TeamCmp,
+               children: [
+                 {path: 'user/:name', component: UserCmp},
+                 {path: 'simple', outlet: 'right', children: [{path: '', component: SimpleCmp}]},
+               ]
+             }]);
+
+
+             router.navigateByUrl('/team/22/user/john');
+             advance(fixture);
+
+             expect(fixture.nativeElement).toHaveText('team 22 [ user john, right:  ]');
+
+             router.navigateByUrl('/team/22/(user/john//right:simple)');
+             advance(fixture);
+
+             expect(fixture.nativeElement).toHaveText('team 22 [ user john, right: simple ]');
+           })));
 
     describe('should use the injector of the lazily-loaded configuration', () => {
       class LazyLoadedServiceDefinedInModule {}
@@ -3858,6 +4043,82 @@ describe('Integration', () => {
          const simpleCmp2 = fixture.debugElement.children[1].componentInstance;
          expect(simpleCmp1).not.toBe(simpleCmp2);
        })));
+
+    it('should not mount the component of the previously reused route when the outlet was not instantiated at the time of route activation',
+       fakeAsync(() => {
+         @Component({
+           selector: 'root-cmp',
+           template:
+               '<div *ngIf="isToolpanelShowing"><router-outlet name="toolpanel"></router-outlet></div>'
+         })
+         class RootCmpWithCondOutlet implements OnDestroy {
+           private subscription: Subscription;
+           public isToolpanelShowing: boolean = false;
+
+           constructor(router: Router) {
+             this.subscription =
+                 router.events.pipe(filter(event => event instanceof NavigationEnd))
+                     .subscribe(
+                         () => this.isToolpanelShowing =
+                             !!router.parseUrl(router.url).root.children['toolpanel']);
+           }
+
+           public ngOnDestroy(): void { this.subscription.unsubscribe(); }
+         }
+
+         @Component({selector: 'tool-1-cmp', template: 'Tool 1 showing'})
+         class Tool1Component {
+         }
+
+         @Component({selector: 'tool-2-cmp', template: 'Tool 2 showing'})
+         class Tool2Component {
+         }
+
+         @NgModule({
+           declarations: [RootCmpWithCondOutlet, Tool1Component, Tool2Component],
+           imports: [
+             CommonModule,
+             RouterTestingModule.withRoutes([
+               {path: 'a', outlet: 'toolpanel', component: Tool1Component},
+               {path: 'b', outlet: 'toolpanel', component: Tool2Component},
+             ]),
+           ],
+         })
+         class TestModule {
+         }
+
+         TestBed.configureTestingModule({imports: [TestModule]});
+
+         const router: Router = TestBed.get(Router);
+         router.routeReuseStrategy = new AttachDetachReuseStrategy();
+
+         const fixture = createRoot(router, RootCmpWithCondOutlet);
+
+         // Activate 'tool-1'
+         router.navigate([{outlets: {toolpanel: 'a'}}]);
+         advance(fixture);
+         expect(fixture).toContainComponent(Tool1Component, '(a)');
+
+         // Deactivate 'tool-1'
+         router.navigate([{outlets: {toolpanel: null}}]);
+         advance(fixture);
+         expect(fixture).not.toContainComponent(Tool1Component, '(b)');
+
+         // Activate 'tool-1'
+         router.navigate([{outlets: {toolpanel: 'a'}}]);
+         advance(fixture);
+         expect(fixture).toContainComponent(Tool1Component, '(c)');
+
+         // Deactivate 'tool-1'
+         router.navigate([{outlets: {toolpanel: null}}]);
+         advance(fixture);
+         expect(fixture).not.toContainComponent(Tool1Component, '(d)');
+
+         // Activate 'tool-2'
+         router.navigate([{outlets: {toolpanel: 'b'}}]);
+         advance(fixture);
+         expect(fixture).toContainComponent(Tool2Component, '(e)');
+       }));
   });
 });
 
@@ -3870,6 +4131,22 @@ describe('Testing router options', () => {
 
     it('should configure the router', fakeAsync(inject([Router], (router: Router) => {
          expect(router.paramsInheritanceStrategy).toEqual('always');
+       })));
+  });
+
+  describe('malformedUriErrorHandler', () => {
+
+    function malformedUriErrorHandler(e: URIError, urlSerializer: UrlSerializer, url: string) {
+      return urlSerializer.parse('/error');
+    }
+
+    beforeEach(() => {
+      TestBed.configureTestingModule(
+          {imports: [RouterTestingModule.withRoutes([], {malformedUriErrorHandler})]});
+    });
+
+    it('should configure the router', fakeAsync(inject([Router], (router: Router) => {
+         expect(router.malformedUriErrorHandler).toBe(malformedUriErrorHandler);
        })));
   });
 });
@@ -4100,6 +4377,10 @@ function createRoot(router: Router, type: any): ComponentFixture<any> {
   router.initialNavigation();
   advance(f);
   return f;
+}
+
+@Component({selector: 'lazy', template: 'lazy-loaded'})
+class LazyComponent {
 }
 
 
