@@ -41,8 +41,24 @@
     "../packages/angular/types.d.ts"
   ],
   "angularCompilerOptions": {
-    "genDir": ".",
-    "debug": true,
-    "skipTemplateCodegen": false
+    // compiler-cli/src/transformers/api.ts#CompilerOptions
+    "diagnostics": true,
+    "basePath": ".",
+    "skipMetadataEmit": false,
+    "strictMetadataEmit": true,
+    "skipTemplateCodegen": false,
+    "strictInjectionParameters": true,
+    "generateCodeForLibraries": true,
+    "fullTemplateTypeCheck": true,
+    "annotationsAs": "static fields",
+    "trace": true,
+    "disableExpressionLowering": true,
+    "disableTypeScriptVersionCheck": false,
+    "preserveWhitespaces": false,
+    "allowEmptyCodegenFiles": false,
+    "enableSummariesForJit": true,
+    "enableResourceInlining": false,
+    "enableIvy": false,
+    "debug": true
   }
 }

@@ -8,12 +8,13 @@ import {PLATFORM_ID} from "./app/packages/angular/core/src/application_tokens";
 import {PlatformRef} from "./app/packages/angular/core/src/application_ref";
 import {TestabilityRegistry} from "./app/packages/angular/core/src/testability/testability";
 import {Console} from "./app/packages/angular/core/src/console";
+import {DemoTestContentProjection} from './app/demo/content-projection/content-projection';
 
 if (environment.production) {
   enableProdMode();
 }
 
-// const platform = platformBrowserDynamic();
+const platform = platformBrowserDynamic();
 
 // platform.bootstrapModule(OverlayModule)
 // platform.bootstrapModule(DemoHttpModule)
@@ -22,7 +23,8 @@ if (environment.production) {
 // platform.bootstrapModule(DemoFormsModule)
 // platform.bootstrapModule(DemoZoneModule)
 // platform.bootstrapModule(FormValidationModule)
-//   .catch(err => console.log(err));
+platform.bootstrapModule(DemoTestContentProjection)
+  .catch(err => console.log(err));
 
 
 /*platform.bootstrapModule(App2Module)
@@ -65,13 +67,13 @@ const platformRef: PlatformRef = platformBrowserDynamic();
 platformRef.bootstrapModule(AppModule).then((appModuleRef: NgModuleRef<AppModule>) => {
   console.log(appModuleRef.instance);
 });*/
-const _CORE_PLATFORM_PROVIDERS: StaticProvider[] = [
-  // Set a default platform name for platforms that don't set it explicitly.
-  {provide: PLATFORM_ID, useValue: 'unknown'},
-  {provide: PlatformRef, deps: [Injector]},
-  {provide: TestabilityRegistry, deps: []},
-  {provide: Console, deps: []},
-];
-export const platformCore = createPlatformFactory(null, 'core', _CORE_PLATFORM_PROVIDERS);
-
-platformCore();
+// const _CORE_PLATFORM_PROVIDERS: StaticProvider[] = [
+//   // Set a default platform name for platforms that don't set it explicitly.
+//   {provide: PLATFORM_ID, useValue: 'unknown'},
+//   {provide: PlatformRef, deps: [Injector]},
+//   {provide: TestabilityRegistry, deps: []},
+//   {provide: Console, deps: []},
+// ];
+// export const platformCore = createPlatformFactory(null, 'core', _CORE_PLATFORM_PROVIDERS);
+//
+// platformCore();
