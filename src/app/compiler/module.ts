@@ -1,9 +1,9 @@
 
 
-import {Component, Directive, Inject, Input, NgModule, Self} from '../packages/angular/core';
+import {Component, Directive, Inject, Input, NgModule, Self} from '@angular/core';
 import "../packages/angular/goog";
 import "hammerjs";
-import {platformBrowserDynamic} from '../packages/angular/platform-browser-dynamic';
+import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 
 
 /**

@@ -1,26 +1,30 @@
+// yarn ngc -p src/app/compiler/tsconfig.json
+// yarn ts-node -P src/app/compiler/tsconfig.json src/app/compiler/metadata.ts
 {
   "compileOnSave": false,
   "compilerOptions": {
     "baseUrl": "../../../",
     "paths": {
-      "@angular/animations": ["src/app/packages/angular/animations"],
-      "@angular/animations/browser": ["src/app/packages/angular/animations/browser"],
-      "@angular/common": ["src/app/packages/angular/common"],
-      "@angular/common/http": ["src/app/packages/angular/common/http"],
-      "@angular/core": ["src/app/packages/angular/core"],
-      "@angular/core/testing": ["src/app/packages/angular/core/testing"],
-      "@angular/forms": ["src/app/packages/angular/forms"],
-      "@angular/platform-browser": ["src/app/packages/angular/platform-browser"],
-      "@angular/platform-browser/animations": ["src/app/packages/angular/platform-browser/animations"],
-      "@angular/platform-browser/testing": ["src/app/packages/angular/platform-browser/testing"],
-      "@angular/platform-browser-dynamic": ["src/app/packages/angular/platform-browser-dynamic"],
-      "@angular/platform-browser-dynamic/testing": ["src/app/packages/angular/platform-browser-dynamic/testing"],
-      "@angular/router": ["src/app/packages/angular/router"],
+//      "@angular/animations": ["src/app/packages/angular/animations"],
+//      "@angular/animations/browser": ["src/app/packages/angular/animations/browser"],
+//      "@angular/common": ["src/app/packages/angular/common"],
+//      "@angular/common/http": ["src/app/packages/angular/common/http"],
+//      "@angular/core": ["src/app/packages/angular/core"],
+//      "@angular/core/testing": ["src/app/packages/angular/core/testing"],
+//      "@angular/forms": ["src/app/packages/angular/forms"],
+//      "@angular/platform-browser": ["src/app/packages/angular/platform-browser"],
+//      "@angular/platform-browser/animations": ["src/app/packages/angular/platform-browser/animations"],
+//      "@angular/platform-browser/testing": ["src/app/packages/angular/platform-browser/testing"],
+//      "@angular/platform-browser-dynamic": ["src/app/packages/angular/platform-browser-dynamic"],
+//      "@angular/platform-browser-dynamic/testing": ["src/app/packages/angular/platform-browser-dynamic/testing"],
+//      "@angular/router": ["src/app/packages/angular/router"],
+      "@angular/*": ["src/app/packages/angular/*"],
       "@ngrx/*": ["src/app/packages/ngrx/*"]
     },
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
     "declaration": false,
+    "module": "es2015",
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -31,6 +35,7 @@
     "types": [
     ],
     "lib": [
+      "es2018",
       "es2017",
       "dom"
     ],
@@ -38,6 +43,7 @@
   },
   "files": [
     "module.ts",
+    "metadata.ts",
     "../packages/angular/types.d.ts"
   ],
   "angularCompilerOptions": {
@@ -45,7 +51,7 @@
     "diagnostics": true,
     "basePath": ".",
     "skipMetadataEmit": false,
-    "strictMetadataEmit": true,
+    "strictMetadataEmit": false,
     "skipTemplateCodegen": false,
     "strictInjectionParameters": true,
     "generateCodeForLibraries": true,

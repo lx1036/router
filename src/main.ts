@@ -9,10 +9,13 @@ import {PlatformRef} from "./app/packages/angular/core/src/application_ref";
 import {TestabilityRegistry} from "./app/packages/angular/core/src/testability/testability";
 import {Console} from "./app/packages/angular/core/src/console";
 import {DemoTestContentProjection} from './app/demo/content-projection/content-projection';
+import {enableDebugTools} from '@angular/platform-browser';
 
 if (environment.production) {
   enableProdMode();
 }
+
+// enableDebugTools();
 
 const platform = platformBrowserDynamic();
 
