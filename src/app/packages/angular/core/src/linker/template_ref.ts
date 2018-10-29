@@ -13,6 +13,9 @@ import {EmbeddedViewRef} from './view_ref';
 
 
 /**
+ * 使用 ViewContainerRef_.createEmbeddedView<C>(templateRef: TemplateRef<C>, context?: C, index?: number): EmbeddedViewRef<C>
+ * 来创建 EmbeddedViewRef。
+ *
  * Represents an embedded template that can be used to instantiate embedded views.
  * To instantiate embedded views based on a template, use the `ViewContainerRef`
  * method `createEmbeddedView()`.

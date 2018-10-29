@@ -392,6 +392,7 @@ export function validateConfig(config: Routes, parentPath: string = ''): void {
   for (let i = 0; i < config.length; i++) {
     const route: Route = config[i];
     const fullPath: string = getFullPath(parentPath, route);
+    console.log(route, fullPath);
     validateNode(route, fullPath);
   }
 }
@@ -439,6 +440,8 @@ function validateNode(route: Route, fullPath: string): void {
         `Invalid configuration of route '${fullPath}': path and matcher cannot be used together`);
   }
   if (route.redirectTo === void 0 && !route.component && !route.children && !route.loadChildren) {
+    console.log(route);
+
     throw new Error(
         `Invalid configuration of route '${fullPath}'. One of the following must be provided: component, redirectTo, children or loadChildren`);
   }

@@ -82,6 +82,8 @@ export function routerNgProbeToken() {
 /**
  * @usageNotes
  *
+ * 1. Location 服务是全局的，forRoot() 中包含，forChild() 中不包含。
+ *
  * RouterModule can be imported multiple times: once per lazily-loaded bundle.
  * Since the router deals with a global shared resource--location, we cannot have
  * more than one router service active.
@@ -115,6 +117,8 @@ export function routerNgProbeToken() {
  * @description
  *
  * Adds router directives and providers.
+ *
+ * 2. 控制状态变化是最难的。另外，会把一个程序切分成多个 bundles。
  *
  * Managing state transitions is one of the hardest parts of building applications. This is
  * especially true on the web, where you also need to ensure that the state is reflected in the URL.

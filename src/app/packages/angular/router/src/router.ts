@@ -481,7 +481,7 @@ export class Router {
                     t.targetSnapshot !);
                 this.triggerEvent(guardsStart);
               }),
-              map(t => {
+              map((t: NavigationTransition) => {
                 const preActivation = new PreActivation(
                     t.targetSnapshot !, t.currentSnapshot, this.ngModule.injector,
                     (evt: Event) => this.triggerEvent(evt));
@@ -905,6 +905,8 @@ export class Router {
     // If the user triggers a navigation imperatively (e.g., by using navigateByUrl),
     // and that navigation results in 'replaceState' that leads to the same URL,
     // we should skip those.
+    console.log(lastNavigation, source, lastNavigation.source, rawUrl.toString(), lastNavigation.rawUrl.toString());
+
     if (lastNavigation && source !== 'imperative' && lastNavigation.source === 'imperative' &&
         lastNavigation.rawUrl.toString() === rawUrl.toString()) {
       return Promise.resolve(true);  // return value is not used

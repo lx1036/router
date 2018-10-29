@@ -23,6 +23,10 @@ import {Tree, TreeNode} from './utils/tree';
  *
  * Represents the state of the router.
  *
+ * "consumed" URL segments:
+ * the extracted parameters:
+ * the resolved data:
+ *
  * RouterState is a tree of activated routes. Every node in this tree knows about the "consumed" URL
  * segments, the extracted parameters, and the resolved data.
  *
