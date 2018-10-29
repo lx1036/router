@@ -10,6 +10,7 @@ import {TestabilityRegistry} from "./app/packages/angular/core/src/testability/t
 import {Console} from "./app/packages/angular/core/src/console";
 import {DemoTestContentProjection} from './app/demo/content-projection/content-projection';
 import {enableDebugTools} from '@angular/platform-browser';
+import {DemoDragDrop} from "./app/demo/drag-drop/drag-drop";
 
 if (environment.production) {
   enableProdMode();
@@ -26,7 +27,8 @@ const platform = platformBrowserDynamic();
 // platform.bootstrapModule(DemoFormsModule)
 // platform.bootstrapModule(DemoZoneModule)
 // platform.bootstrapModule(FormValidationModule)
-platform.bootstrapModule(DemoTestContentProjection)
+// platform.bootstrapModule(DemoTestContentProjection)
+platform.bootstrapModule(DemoDragDrop)
   .catch(err => console.log(err));
 
 

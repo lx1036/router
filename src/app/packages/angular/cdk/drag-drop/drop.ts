@@ -47,7 +47,7 @@ const DROP_PROXIMITY_THRESHOLD = 0.05;
   template: '<ng-content></ng-content>',
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['drop.css'],
+  styleUrls: ['drop.scss'],
   providers: [
     {provide: CDK_DROP_CONTAINER, useExisting: CdkDrop},
   ],

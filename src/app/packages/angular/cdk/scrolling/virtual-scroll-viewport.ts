@@ -42,7 +42,7 @@ function rangesEqual(r1: ListRange, r2: ListRange): boolean {
   moduleId: module.id,
   selector: 'cdk-virtual-scroll-viewport',
   templateUrl: 'virtual-scroll-viewport.html',
-  styleUrls: ['virtual-scroll-viewport.css'],
+  styleUrls: ['virtual-scroll-viewport.scss'],
   host: {
     'class': 'cdk-virtual-scroll-viewport',
     '[class.cdk-virtual-scroll-orientation-horizontal]': 'orientation === "horizontal"',
