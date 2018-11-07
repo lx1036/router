@@ -5,8 +5,8 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'bitkan-hero',
-  templateUrl: './hero.html',
-  styleUrls: ['./hero.css']
+  template: '<p>test</p>',
+  // styleUrls: ['./hero.css']
 })
 export class BitkanHero implements OnInit {
   public name: string = 'hello word';

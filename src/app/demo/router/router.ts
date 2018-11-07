@@ -1,8 +1,7 @@
-import {Component, NgModule, OnInit} from '@angular/core';
+import {Component, ElementRef, Injector, NgModule, OnInit, TemplateRef} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {ActivatedRoute, Router, RouterModule, Routes, RoutesRecognized} from '@angular/router';
-import {children} from '../../packages/angular/compiler-cli/integrationtest/bazel/injectable_def/app/src/root';
-import {filter, filter} from 'rxjs/operators';
+import {filter} from 'rxjs/operators';
 
 /**
  * https://angular.cn/guide/router
@@ -18,12 +17,16 @@ import {filter, filter} from 'rxjs/operators';
   `
 })
 export class AdvisorComponent implements OnInit {
-  constructor(private _route: ActivatedRoute) {}
+  constructor(private _route: ActivatedRoute, private _injector: Injector, private element: ElementRef) {}
 
   ngOnInit() {
     this._route.params.subscribe(params => {
       console.log(params);
     });
+
+    console.log(this.element.nativeElement);
+
+    // console.log(this._injector.get(TemplateRef));
 
     // this._router.routerState.root.firstChild.params.subscribe(params => {
     //   console.log(params);

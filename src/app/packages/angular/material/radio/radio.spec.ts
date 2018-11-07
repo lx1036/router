@@ -217,7 +217,7 @@ describe('MatRadio', () => {
       expect(radioInstances[1].checked).toBe(true);
     });
 
-    it('should deselect all of the checkboxes when the group value is cleared', () => {
+    it('should deselect all of the radios when the group value is cleared', () => {
       radioInstances[0].checked = true;
 
       expect(groupInstance.value).toBeTruthy();
@@ -410,6 +410,7 @@ describe('MatRadio', () => {
     });
 
     it('should check the corresponding radio button on group value change', () => {
+
       expect(groupInstance.value).toBeFalsy();
       for (const radio of radioInstances) {
         expect(radio.checked).toBeFalsy();

@@ -26,10 +26,10 @@
     "**/testing/*",
     "**/test/*",
     "app/packages/angular/cdk/*",
-    "app/packages/angular/material",
-    "app/packages/angular/compiler",
-    "app/packages/angular/compiler-cli",
-    "app/compiler",
-    "app/framework"
+    "app/packages/angular/material/*",
+    "app/packages/angular/compiler/*",
+    "app/packages/angular/compiler-cli/*",
+    "app/compiler/*",
+    "app/framework/*"
   ]
 }
