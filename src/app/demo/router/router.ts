@@ -1,4 +1,4 @@
-import {Component, ElementRef, Injector, NgModule, OnInit, TemplateRef} from '@angular/core';
+import {Component, ElementRef, Injector, NgModule, OnInit, TemplateRef, ViewEncapsulation} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {ActivatedRoute, Router, RouterModule, Routes, RoutesRecognized} from '@angular/router';
 import {filter} from 'rxjs/operators';
@@ -10,11 +10,32 @@ import {filter} from 'rxjs/operators';
  */
 
 @Component({
+  selector: 'styled-shadow-comp',
+  template: '<div class="red">StyledShadowComponent</div>',
+  encapsulation: ViewEncapsulation.ShadowDom,
+  styles: [`:host { border: 1px solid black; } .red { border: 1px solid red; }`]
+})
+class StyledShadowComponent {
+}
+
+@Component({
   selector: 'advisor',
   template: `
     <a routerLink="household">Advisor</a>
+    <styled-shadow-comp></styled-shadow-comp>
     <router-outlet></router-outlet>
-  `
+  `,
+  styles: [
+    `
+      a {
+          background: #ff3d00;
+      }
+      :host {
+          border: 2px solid black;
+      }
+    `
+  ],
+  // encapsulation: ViewEncapsulation.ShadowDom
 })
 export class AdvisorComponent implements OnInit {
   constructor(private _route: ActivatedRoute, private _injector: Injector, private element: ElementRef) {}
@@ -137,6 +158,7 @@ const routes: Routes = [
     DemoCustomHeader,
     AdvisorComponent,
     HouseholdComponent,
+    StyledShadowComponent,
   ],
   bootstrap: [DemoRouter]
 })

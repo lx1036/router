@@ -1,21 +1,37 @@
 // Karma configuration
 // Generated on Tue Nov 06 2018 13:49:37 GMT+0800 (China Standard Time)
-
+/**
+ * @link https://github.com/monounity/karma-typescript
+ *
+ *  yarn karma start ./src/app/demo/karma/karma.conf.js --fail-on-empty-test-suite
+ */
 module.exports = function(config) {
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
 
+    /**
+     * Configuration for karma-typescript
+     *
+     * https://github.com/monounity/karma-typescript/blob/master/README.md#advanced-configuration
+     */
+    karmaTypescriptConfig: {
+      tsconfig: './tsconfig.json',
+    },
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['jasmine',"karma-typescript"],
+    frameworks: ['jasmine', "karma-typescript"],
 
-
+    /**
+     * files configuration
+     *
+     * https://karma-runner.github.io/3.0/config/files.html
+     */
     // list of files / patterns to load in the browser
     files: [
-      './*.spec.ts'
+      '*.ts'
     ],
 
 
@@ -43,7 +59,7 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress'],
+    reporters: ['dots', 'karma-typescript', 'progress'],
 
 
     // web server port
