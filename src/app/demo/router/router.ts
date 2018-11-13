@@ -1,7 +1,17 @@
-import {Component, ElementRef, Injector, NgModule, OnInit, TemplateRef, ViewEncapsulation} from '@angular/core';
+import {Component, ElementRef, Injectable, Injector, NgModule, OnInit, TemplateRef, ViewEncapsulation} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
-import {ActivatedRoute, Router, RouterModule, Routes, RoutesRecognized} from '@angular/router';
+import {
+  ActivatedRoute,
+  ActivatedRouteSnapshot, CanActivate, CanActivateChild,
+  Resolve,
+  Router,
+  RouterModule,
+  RouterStateSnapshot,
+  Routes,
+  RoutesRecognized
+} from '@angular/router';
 import {filter} from 'rxjs/operators';
+import {Observable, of} from 'rxjs';
 
 /**
  * https://angular.cn/guide/router
@@ -21,7 +31,7 @@ class StyledShadowComponent {
 @Component({
   selector: 'advisor',
   template: `
-    <a routerLink="household">Advisor</a>
+    <a routerLink="households">Advisor</a>
     <styled-shadow-comp></styled-shadow-comp>
     <router-outlet></router-outlet>
   `,
@@ -42,10 +52,10 @@ export class AdvisorComponent implements OnInit {
 
   ngOnInit() {
     this._route.params.subscribe(params => {
-      console.log(params);
+      // console.log(params);
     });
 
-    console.log(this.element.nativeElement);
+    // console.log(this.element.nativeElement);
 
     // console.log(this._injector.get(TemplateRef));
 
@@ -67,14 +77,14 @@ export class HouseholdComponent implements OnInit {
 
   ngOnInit() {
     this._route.params.subscribe(params => {
-      console.log(params);
+      // console.log(params);
     });
 
-    console.log(this._router.routerState.root.children);
+    // console.log(this._router.routerState.root.children);
 
 
     this._router.routerState.root.firstChild.params.subscribe(params => {
-      console.log(params);
+      // console.log(params);
     });
 
     // console.log(this._router.routerState.root.params);
@@ -100,7 +110,7 @@ export class DemoCustomHeader implements OnInit {
     this._router.events.pipe(
       filter(event => event instanceof RoutesRecognized),
     ).subscribe((event: RoutesRecognized) => {
-      console.log(event.state.root, event.state.root.firstChild.params, event.state.root.firstChild.firstChild.params, event.url, event.urlAfterRedirects);
+      // console.log(event.state.root, event.state.root.firstChild.params, event.state.root.firstChild.firstChild.params, event.url, event.urlAfterRedirects);
     });
     // this._router.events.pipe(filter(events => events instanceof RoutesRecognized)).subscribe(
     //   (event: RoutesRecognized) => {
@@ -129,6 +139,29 @@ export class DemoRouter {
 }
 
 
+
+@Injectable({
+  providedIn: 'root'
+})
+export class TestCanActivate implements CanActivate {
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
+    console.log(TestCanActivate.name, 'lx1036');
+
+    return of(true);
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class TestCanActivateChild implements CanActivateChild {
+  canActivateChild(childRoute: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
+    console.log(TestCanActivateChild.name, 'lx1037');
+
+    return of(true);
+  }
+}
+
 const routes: Routes = [
   {
     path: '',
@@ -138,6 +171,8 @@ const routes: Routes = [
   {
     path: 'advisor/:advisorId',
     component: AdvisorComponent,
+    canActivate: [TestCanActivate],
+    canActivateChild: [TestCanActivateChild],
     children: [
       {
         path: 'household/:householdId',
@@ -152,7 +187,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [BrowserModule, RouterModule.forRoot(routes)],
+  imports: [BrowserModule, RouterModule.forRoot(routes), RouterModule.forRoot([])],
   declarations: [
     DemoRouter,
     DemoCustomHeader,
