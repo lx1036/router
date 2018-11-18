@@ -13,6 +13,7 @@ import {enableDebugTools} from '@angular/platform-browser';
 import {DemoDragDrop} from "./app/demo/drag-drop/drag-drop";
 import {DemoView} from "./app/demo/view/view_ref";
 import {DemoRouterModule} from './app/demo/router/router';
+import {DemoZoneModule} from "./app/demo/zone/zone";
 
 if (environment.production) {
   enableProdMode();
@@ -27,12 +28,12 @@ const platform = platformBrowserDynamic();
 // platform.bootstrapModule(TestCustomHttpClientModule)
 // platform.bootstrapModule(DemoModuleLoaderModule)
 // platform.bootstrapModule(DemoFormsModule)
-// platform.bootstrapModule(DemoZoneModule)
+platform.bootstrapModule(DemoZoneModule)
 // platform.bootstrapModule(FormValidationModule)
 // platform.bootstrapModule(DemoTestContentProjection)
 // platform.bootstrapModule(DemoDragDrop)
 // platform.bootstrapModule(DemoView)
-platform.bootstrapModule(DemoRouterModule)
+// platform.bootstrapModule(DemoRouterModule)
   .catch(err => console.log(err));
 
 

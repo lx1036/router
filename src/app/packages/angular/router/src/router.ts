@@ -361,8 +361,17 @@ export class Router {
       preActivation: null
     });
     this.navigations = this.setupNavigations(this.transitions);
-
-    this.processNavigations();
+  
+    this.navigations.subscribe(
+      t => {
+        this.navigated = true;
+        this.lastSuccessfulId = t.id;
+        (this.events as Subject<Event>).next(new NavigationEnd(t.id, this.serializeUrl(t.extractedUrl), this.serializeUrl(this.currentUrlTree)));
+        t.resolve(true);
+      },
+      e => { this.console.warn(`Unhandled Navigation Error: `); });
+    
+    // this.processNavigations();
   }
 
   private setupNavigations(transitions: Observable<NavigationTransition>):
@@ -886,16 +895,7 @@ export class Router {
   }
 
   private processNavigations(): void {
-    this.navigations.subscribe(
-        t => {
-          this.navigated = true;
-          this.lastSuccessfulId = t.id;
-          (this.events as Subject<Event>)
-              .next(new NavigationEnd(
-                  t.id, this.serializeUrl(t.extractedUrl), this.serializeUrl(this.currentUrlTree)));
-          t.resolve(true);
-        },
-        e => { this.console.warn(`Unhandled Navigation Error: `); });
+  
   }
 
   private scheduleNavigation(

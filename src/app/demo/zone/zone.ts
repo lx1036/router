@@ -47,7 +47,7 @@ import {BrowserModule} from "@angular/platform-browser";
        this.progress += 1;
        console.log(`Current progress: ${this.progress}%`);
 
-       if (this.progress < 20) {
+       if (this.progress < 5) {
            window.setTimeout(() => this._increaseProgress(doneCallback), 1000);
          } else {
            doneCallback();

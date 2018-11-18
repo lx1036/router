@@ -187,7 +187,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [BrowserModule, RouterModule.forRoot(routes), RouterModule.forRoot([])],
+  imports: [BrowserModule, RouterModule.forRoot(routes)],
   declarations: [
     DemoRouter,
     DemoCustomHeader,
