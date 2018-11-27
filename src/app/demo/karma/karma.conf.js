@@ -9,7 +9,7 @@ module.exports = function(config) {
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: '',
+    basePath: '.',
 
     /**
      * Configuration for karma-typescript
@@ -31,7 +31,9 @@ module.exports = function(config) {
      */
     // list of files / patterns to load in the browser
     files: [
-      '*.ts'
+      '*.spec.ts',
+      // 'substract2.ts',
+      'substract/**/*.ts',
     ],
 
 
@@ -43,7 +45,8 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      '*.ts': ['karma-typescript']
+      '*.ts': ['karma-typescript'],
+      'substract/**/*.ts': ['karma-typescript'],
     },
 
     // typescriptPreprocessor: {

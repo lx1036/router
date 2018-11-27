@@ -21,8 +21,9 @@
     ]
   },
   "include": [
-    "../../packages/angular/*.d.ts",
-    "./*spec.ts"
+//    "../../packages/angular/*.d.ts",
+    "./*spec.ts",
+    "./substract/**/*.ts"
   ],
   "exclude": [
     "node_modules"
