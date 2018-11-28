@@ -16,6 +16,9 @@ module.exports = function (config) {
     // files: [
     //   'test.ts'
     // ],
+    files: [
+      './app/demo/karma/application_init.spec.ts'
+    ],
     client: {
       clearContext: false // leave Jasmine Spec Runner output visible in browser
     },
@@ -36,6 +39,6 @@ module.exports = function (config) {
         flags: ['--no-sandbox']
       }
     },
-    singleRun: false
+    singleRun: true
   });
 };

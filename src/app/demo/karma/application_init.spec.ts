@@ -5,11 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-// import {Injector, APP_INITIALIZER, ApplicationInitStatus, Injectable} from '@angular/core';
-// import {TestBed, async, inject} from '@angular/core/testing';
+import {Injector, APP_INITIALIZER, ApplicationInitStatus, Injectable} from '@angular/core';
+import {TestBed, async, inject} from '@angular/core/testing';
 
 
-// @Injectable()
+@Injectable()
 export class Test {}
 
 describe('ApplicationInitStatus', () => {
@@ -20,6 +20,7 @@ describe('ApplicationInitStatus', () => {
   
   it('decorator', () => {
     const test = new Test();
+    expect(test).toBe(true);
   });
 });
 

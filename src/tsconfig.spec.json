@@ -13,7 +13,7 @@
     "polyfills.ts"
   ],
   "include": [
-    "app/app.component.spec.ts",
+    "app/demo/karma/*.spec.ts",
     "**/*.d.ts"
   ],
   "exclude": [
