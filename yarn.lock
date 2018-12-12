@@ -261,6 +261,11 @@
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.7.0.tgz#9a06f4f137ee84d7df0460c1fdb1135ffa6c50fd"
   integrity sha1-mgb08TfuhNffBGDB/bETX/psUP0=
 
+"@swimlane/ngx-datatable@^14.0.0":
+  version "14.0.0"
+  resolved "http://registry.npm.taobao.org/@swimlane/ngx-datatable/download/@swimlane/ngx-datatable-14.0.0.tgz#6227625e2ce2e9143735d4deeb3ab34b88745c26"
+  integrity sha1-YidiXizi6RQ3NdTe6zqzS4h0XCY=
+
 "@types/hammerjs@^2.0.35":
   version "2.0.35"
   resolved "http://registry.npm.taobao.org/@types/hammerjs/download/@types/hammerjs-2.0.35.tgz#7b7c950c7d54593e23bffc8d2b4feba9866a7277"
