@@ -68,7 +68,7 @@ describe('createUrlTree', () => {
     expect(params[1].path).toEqual('11');
   });
 
-  it('should support first segments contaings slashes', () => {
+  it('should support first segments contains slashes', () => {
     const p = serializer.parse('/');
     const t = createRoot(p, [{segmentPath: '/one'}, 'two/three']);
     expect(serializer.serialize(t)).toEqual('/%2Fone/two%2Fthree');

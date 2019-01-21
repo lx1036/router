@@ -226,8 +226,7 @@ export class PlatformRef {
       }
       moduleRef.onDestroy(() => remove(this._modules, moduleRef));
       ngZone !.runOutsideAngular(
-          () => ngZone !.onError.subscribe(
-              {next: (error: any) => { exceptionHandler.handleError(error); }}));
+          () => ngZone !.onError.subscribe({next: (error: any) => { exceptionHandler.handleError(error); }}));
       return _callAndReportToErrorHandler(exceptionHandler, ngZone !, () => {
         const initStatus: ApplicationInitStatus = moduleRef.injector.get(ApplicationInitStatus);
         initStatus.runInitializers();

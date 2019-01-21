@@ -30,12 +30,12 @@ const platform = platformBrowserDynamic();
 // platform.bootstrapModule(DemoModuleLoaderModule)
 // platform.bootstrapModule(DemoFormsModule)
 // platform.bootstrapModule(DemoZoneModule)
-platform.bootstrapModule(DemoDataTableModule)
+// platform.bootstrapModule(DemoDataTableModule)
 // platform.bootstrapModule(FormValidationModule)
 // platform.bootstrapModule(DemoTestContentProjection)
 // platform.bootstrapModule(DemoDragDrop)
 // platform.bootstrapModule(DemoView)
-// platform.bootstrapModule(DemoRouterModule)
+platform.bootstrapModule(DemoRouterModule)
   .catch(err => console.log(err));
 
 

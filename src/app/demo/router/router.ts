@@ -77,7 +77,7 @@ export class HouseholdComponent implements OnInit {
 
   ngOnInit() {
     this._route.params.subscribe(params => {
-      // console.log(params);
+      console.log(params);
     });
 
     // console.log(this._router.routerState.root.children);
@@ -187,7 +187,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [BrowserModule, RouterModule.forRoot(routes)],
+  imports: [BrowserModule, RouterModule.forRoot(routes, {paramsInheritanceStrategy: "always"})],
   declarations: [
     DemoRouter,
     DemoCustomHeader,
