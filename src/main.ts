@@ -15,6 +15,7 @@ import {DemoView} from "./app/demo/view/view_ref";
 import {DemoRouterModule} from './app/demo/router/router';
 import {DemoZoneModule} from "./app/demo/zone/zone";
 import {DemoDataTableModule} from './app/demo/datatable/datatable';
+import {AffixModuleDemo} from './app/demo/affix/affix';
 
 if (environment.production) {
   enableProdMode();
@@ -35,7 +36,8 @@ const platform = platformBrowserDynamic();
 // platform.bootstrapModule(DemoTestContentProjection)
 // platform.bootstrapModule(DemoDragDrop)
 // platform.bootstrapModule(DemoView)
-platform.bootstrapModule(DemoRouterModule)
+// platform.bootstrapModule(DemoRouterModule)
+platform.bootstrapModule(AffixModuleDemo)
   .catch(err => console.log(err));
 
 
