@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { INCREMENT, DECREMENT } from "../redux/actions";
 
-class Counter extends React.Component {
+class Counter extends React.Component<{dispatch: any, count: any}, any> {
   // state = { count: 0 };
 
   increment = () => {
