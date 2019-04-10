@@ -8,6 +8,7 @@
 
 import {NgModuleFactory, NgModuleRef, Type} from '@angular/core';
 import {Observable} from 'rxjs';
+import {EmptyOutletComponent} from './components/empty_outlet';
 import {PRIMARY_OUTLET} from './shared';
 import {UrlSegment, UrlSegmentGroup} from './url_tree';
 
@@ -42,6 +43,7 @@ import {UrlSegment, UrlSegmentGroup} from './url_tree';
  * - `loadChildren` is a reference to lazy loaded child routes. See `LoadChildren` for more
  *   info.
  *
+ * @usageNotes
  * ### Simple Configuration
  *
  * ```
@@ -251,7 +253,6 @@ import {UrlSegment, UrlSegmentGroup} from './url_tree';
  * Then it will extract the set of routes defined in that NgModule, and will transparently add
  * those routes to the main configuration.
  *
- *  use Routes
  */
 export type Routes = Route[];
 
@@ -391,6 +392,7 @@ export function validateConfig(config: Routes, parentPath: string = ''): void {
   for (let i = 0; i < config.length; i++) {
     const route: Route = config[i];
     const fullPath: string = getFullPath(parentPath, route);
+    console.log(route, fullPath);
     validateNode(route, fullPath);
   }
 }
@@ -412,9 +414,10 @@ function validateNode(route: Route, fullPath: string): void {
   if (Array.isArray(route)) {
     throw new Error(`Invalid configuration of route '${fullPath}': Array cannot be specified`);
   }
-  if (!route.component && (route.outlet && route.outlet !== PRIMARY_OUTLET)) {
+  if (!route.component && !route.children && !route.loadChildren &&
+      (route.outlet && route.outlet !== PRIMARY_OUTLET)) {
     throw new Error(
-        `Invalid configuration of route '${fullPath}': a componentless route cannot have a named outlet set`);
+        `Invalid configuration of route '${fullPath}': a componentless route without children or loadChildren cannot have a named outlet set`);
   }
   if (route.redirectTo && route.children) {
     throw new Error(
@@ -437,6 +440,8 @@ function validateNode(route: Route, fullPath: string): void {
         `Invalid configuration of route '${fullPath}': path and matcher cannot be used together`);
   }
   if (route.redirectTo === void 0 && !route.component && !route.children && !route.loadChildren) {
+    console.log(route);
+
     throw new Error(
         `Invalid configuration of route '${fullPath}'. One of the following must be provided: component, redirectTo, children or loadChildren`);
   }
@@ -477,8 +482,14 @@ function getFullPath(parentPath: string, currentRoute: Route): string {
   }
 }
 
-
-export function copyConfig(r: Route): Route {
-  const children = r.children && r.children.map(copyConfig);
-  return children ? {...r, children} : {...r};
+/**
+ * Makes a copy of the config and adds any default required properties.
+ */
+export function standardizeConfig(r: Route): Route {
+  const children = r.children && r.children.map(standardizeConfig);
+  const c = children ? {...r, children} : {...r};
+  if (!c.component && (children || c.loadChildren) && (c.outlet && c.outlet !== PRIMARY_OUTLET)) {
+    c.component = EmptyOutletComponent;
+  }
+  return c;
 }

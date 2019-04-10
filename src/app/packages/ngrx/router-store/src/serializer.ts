@@ -1,10 +1,21 @@
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 
-export abstract class RouterStateSerializer<T> {
+/**
+ * Simple router state.
+ * All custom router states / state serializers should have at least
+ * the properties of this interface.
+ */
+export interface BaseRouterStoreState {
+  url: string;
+}
+
+export abstract class RouterStateSerializer<
+  T extends BaseRouterStoreState = BaseRouterStoreState
+> {
   abstract serialize(routerState: RouterStateSnapshot): T;
 }
 
-export interface SerializedRouterStateSnapshot {
+export interface SerializedRouterStateSnapshot extends BaseRouterStoreState {
   root: ActivatedRouteSnapshot;
   url: string;
 }
@@ -22,7 +33,7 @@ export class DefaultRouterStateSerializer
     route: ActivatedRouteSnapshot
   ): ActivatedRouteSnapshot {
     const children = route.children.map(c => this.serializeRoute(c));
-    return ({
+    return {
       params: route.params,
       paramMap: route.paramMap,
       data: route.data,
@@ -42,6 +53,6 @@ export class DefaultRouterStateSerializer
       firstChild: children[0],
       pathFromRoot: undefined as any,
       children,
-    } as ActivatedRouteSnapshot);
+    };
   }
 }

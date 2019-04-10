@@ -9,32 +9,51 @@
 import {ApplicationRef} from '../application_ref';
 import {ChangeDetectorRef} from '../change_detection/change_detector_ref';
 
+/**
+ * Represents an Angular [view](guide/glossary#view),
+ * specifically the [host view](guide/glossary#view-tree) that is defined by a component.
+ * Also serves as the base class
+ * that adds destroy methods for [embedded views](guide/glossary#view-tree). 
+ * 
+ * @see `EmbeddedViewRef` 
+ */
 export abstract class ViewRef extends ChangeDetectorRef {
   /**
-   * Destroys the view and all of the data structures associated with it.
+   * Destroys this view and all of the data structures associated with it.
    */
   abstract destroy(): void;
 
+  /**
+   * Reports whether this view has been destroyed.
+   * @returns True after the `destroy()` method has been called, false otherwise.
+   */
   abstract get destroyed(): boolean;
 
+  /**
+   * A lifecycle hook that provides additional developer-defined cleanup
+   * functionality for views.
+   * @param callback A handler function that cleans up developer-defined data
+   * associated with a view. Called when the `destroy()` method is invoked.
+   */
   abstract onDestroy(callback: Function): any /** TODO #9100 */;
 }
 
 /**
- * Represents an Angular View.
+ * Represents an Angular [view](guide/glossary#view) in a view container.
+ * An [embedded view](guide/glossary#view-tree) can be referenced from a component
+ * other than the hosting component whose template defines it, or it can be defined
+ * independently by a `TemplateRef`.
  *
- * <!-- TODO: move the next two paragraphs to the dev guide -->
- * A View is a fundamental building block of the application UI. It is the smallest grouping of
- * Elements which are created and destroyed together.
+ * Properties of elements in a view can change, but the structure (number and order) of elements in
+ * a view cannot. Change the structure of elements by inserting, moving, or
+ * removing nested views in a view container.
  *
- * Properties of elements in a View can change, but the structure (number and order) of elements in
- * a View cannot. Changing the structure of Elements can only be done by inserting, moving or
- * removing nested Views via a {@link ViewContainerRef}. Each View can contain many View Containers.
- * <!-- /TODO -->
+ * @see `ViewContainerRef`
  *
- * ### Example
+ * @usageNotes
  *
- * Given this template...
+ * The following template breaks down into two separate `TemplateRef` instances,
+ * an outer one and an inner one.
  *
  * ```
  * Count: {{items.length}}
@@ -43,9 +62,8 @@ export abstract class ViewRef extends ChangeDetectorRef {
  * </ul>
  * ```
  *
- * We have two {@link TemplateRef}s:
+ * This is the outer `TemplateRef`:
  *
- * Outer {@link TemplateRef}:
  * ```
  * Count: {{items.length}}
  * <ul>
@@ -53,14 +71,13 @@ export abstract class ViewRef extends ChangeDetectorRef {
  * </ul>
  * ```
  *
- * Inner {@link TemplateRef}:
+ * This is the inner `TemplateRef`:
+ *
  * ```
  *   <li>{{item}}</li>
  * ```
  *
- * Notice that the original template is broken down into two separate {@link TemplateRef}s.
- *
- * The outer/inner {@link TemplateRef}s are then assembled into views like so:
+ * The outer and inner `TemplateRef` instances are assembled into views as follows:
  *
  * ```
  * <!-- ViewRef: outer-0 -->
@@ -75,8 +92,14 @@ export abstract class ViewRef extends ChangeDetectorRef {
  * @experimental
  */
 export abstract class EmbeddedViewRef<C> extends ViewRef {
+  /**
+   * The context for this view, inherited from the anchor element.
+   */
   abstract get context(): C;
 
+  /**
+   * The root nodes for this embedded view.
+   */
   abstract get rootNodes(): any[];
 }
 

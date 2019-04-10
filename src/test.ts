@@ -9,6 +9,9 @@ import {
 
 declare const require: any;
 
+/**
+ * 创建测试环境，包括实例化 compiler factory, PlatformRef, a testing module 对象
+ */
 // First, initialize the Angular testing environment.
 getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,

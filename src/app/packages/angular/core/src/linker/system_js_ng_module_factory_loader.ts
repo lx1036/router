@@ -28,12 +28,14 @@ export abstract class SystemJsNgModuleLoaderConfig {
   /**
    * Prefix to add when computing the name of the factory module for a given module name.
    */
-  factoryPathPrefix: string;
+  // TODO(issue/24571): remove '!'.
+  factoryPathPrefix !: string;
 
   /**
    * Suffix to add when computing the name of the factory module for a given module name.
    */
-  factoryPathSuffix: string;
+  // TODO(issue/24571): remove '!'.
+  factoryPathSuffix !: string;
 }
 
 const DEFAULT_CONFIG: SystemJsNgModuleLoaderConfig = {
@@ -64,9 +66,10 @@ export class SystemJsNgModuleLoader implements NgModuleFactoryLoader {
       exportName = 'default';
     }
 
+    console.log(module, exportName);
 
     return System.import(module)
-        .then((module: any) => module[exportName])
+        .then((module: any) => {console.log(module); return module[exportName];})
         .then((type: any) => checkNotEmpty(type, module, exportName))
         .then((type: any) => this._compiler.compileModuleAsync(type));
   }

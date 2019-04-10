@@ -80,7 +80,7 @@ export class InertBodyHelper {
     const xhr = new XMLHttpRequest();
     xhr.responseType = 'document';
     xhr.open('GET', 'data:text/html;charset=utf-8,' + html, false);
-    xhr.send(null);
+    xhr.send(undefined);
     const body: HTMLBodyElement = xhr.response.body;
     body.removeChild(body.firstChild !);
     return body;
@@ -146,12 +146,12 @@ export class InertBodyHelper {
     // loop backwards so that we can support removals.
     for (let i = elAttrs.length - 1; 0 < i; i--) {
       const attrib = elAttrs.item(i);
-      const attrName = attrib.name;
+      const attrName = attrib !.name;
       if (attrName === 'xmlns:ns1' || attrName.indexOf('ns1:') === 0) {
         el.removeAttribute(attrName);
       }
     }
-    let childNode = el.firstChild;
+    let childNode = el.firstChild as Node | null;
     while (childNode) {
       if (childNode.nodeType === Node.ELEMENT_NODE) this.stripCustomNsAttrs(childNode as Element);
       childNode = childNode.nextSibling;

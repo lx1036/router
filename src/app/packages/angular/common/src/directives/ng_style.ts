@@ -32,17 +32,19 @@ import {Directive, DoCheck, ElementRef, Input, KeyValueChanges, KeyValueDiffer, 
  */
 @Directive({selector: '[ngStyle]'})
 export class NgStyle implements DoCheck {
-  private _ngStyle: {[key: string]: string};
-  private _differ: KeyValueDiffer<string, string|number>;
+  // TODO(issue/24571): remove '!'.
+  private _ngStyle !: {[key: string]: string};
+  // TODO(issue/24571): remove '!'.
+  private _differ !: KeyValueDiffer<string, string|number>;
 
   constructor(
       private _differs: KeyValueDiffers, private _ngEl: ElementRef, private _renderer: Renderer2) {}
 
   @Input()
-  set ngStyle(v: {[key: string]: string}) {
-    this._ngStyle = v;
-    if (!this._differ && v) {
-      this._differ = this._differs.find(v).create();
+  set ngStyle(values: {[key: string]: string}) {
+    this._ngStyle = values;
+    if (!this._differ && values) {
+      this._differ = this._differs.find(values).create();
     }
   }
 

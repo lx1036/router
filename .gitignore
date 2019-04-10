@@ -37,3 +37,7 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+src/app/compiler/node_modules
+src/app/compiler/*.js
+src/app/packages/angular/core/src/*/*.js
+dist

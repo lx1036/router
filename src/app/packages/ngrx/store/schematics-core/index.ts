@@ -42,13 +42,13 @@ export {
 
 export {
   addReducerToState,
-  addReducerToStateInferface,
+  addReducerToStateInterface,
   addReducerImportToNgModule,
   addReducerToActionReducerMap,
   omit,
 } from './utility/ngrx-utils';
 
-export { getProjectPath } from './utility/project';
+export { getProjectPath, getProject, isLib } from './utility/project';
 export { insertImport } from './utility/route-utils';
 
 export const stringUtils = {
