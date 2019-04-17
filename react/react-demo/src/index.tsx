@@ -1,23 +1,54 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
+// import App from './App';
 import * as serviceWorker from './serviceWorker';
-import { createStore } from "redux";
+import { createStore, Action } from "redux";
 import { Provider } from "react-redux";
+import Counter from './Components/Counter';
 
 
+////////////////////////////Counter Demo//////////////////////////////////////////////////
+export const INCREMENT = "INCREMENT";
+export const DECREMENT = "DECREMENT";
+export const RESET = "RESET";
+
+const initialState = { count: 0 };
+const reducer = (state = initialState, action: Action) => {
+  console.log("reducer", state, action);
+
+  switch (action.type) {
+    case INCREMENT:
+      return {
+        count: state.count + 1
+      };
+    case DECREMENT:
+      return {
+        count: state.count - 1
+      };
+    case RESET:
+      return {
+        count: state.count
+      };
+    default:
+      return {
+        count: state.count
+      };
+  }
+};
+const store = createStore(reducer, (window as any).__REDUX_DEVTOOLS_EXTENSION__ && (window as any).__REDUX_DEVTOOLS_EXTENSION__());
+store.dispatch({ type: INCREMENT });
+store.dispatch({ type: INCREMENT });
+store.dispatch({ type: DECREMENT });
+store.dispatch({ type: RESET });
 
 
-
-
-
-
-// const App = () => (
-//   <Provider store={store}>
-//     <Counter />
-//   </Provider>
-// );
+const App = () => (
+  <Provider store={store}>
+    <Counter />
+  </Provider>
+);
+////////////////////////////Counter Demo//////////////////////////////////////////////////
 
 
 

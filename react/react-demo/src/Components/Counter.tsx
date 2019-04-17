@@ -36,5 +36,5 @@ class Counter extends React.Component<{dispatch: any, count: any}, any> {
 }
 
 // export default Counter;
-const mapStateToProps = state => ({ count: state.count });
+const mapStateToProps = (state: any) => ({ count: state.count });
 export default connect(mapStateToProps)(Counter);
