@@ -6,12 +6,11 @@ import * as serviceWorker from './serviceWorker';
 import { createStore, Action } from "redux";
 import { Provider } from "react-redux";
 import Counter from './Components/Counter';
+import {INCREMENT, DECREMENT, RESET} from "./redux/actions";
 
 
 ////////////////////////////Counter Demo//////////////////////////////////////////////////
-export const INCREMENT = "INCREMENT";
-export const DECREMENT = "DECREMENT";
-export const RESET = "RESET";
+
 
 const initialState = { count: 0 };
 const reducer = (state = initialState, action: Action) => {
