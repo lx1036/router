@@ -7,7 +7,7 @@ import { createStore, Action } from "redux";
 import { Provider } from "react-redux";
 import Counter from './Components/Counter';
 import {INCREMENT, DECREMENT, RESET} from "./redux/actions";
-
+import {Game} from './Demo/Game/Game';
 
 ////////////////////////////Counter Demo//////////////////////////////////////////////////
 
@@ -51,7 +51,8 @@ const App = () => (
 
 
 
-ReactDOM.render(<App />, document.getElementById('root'));
+// ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(<Game />, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
