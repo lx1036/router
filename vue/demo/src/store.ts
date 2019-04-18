@@ -19,7 +19,7 @@ export default new Vuex.Store({
     increment: ({commit}) => commit('increment'),
     decrement: ({commit}) => commit('decrement'),
     incrementIfOdd: ({commit, state}) => {
-      if (state.count % 2 === 0) {
+      if (state.count % 2 !== 0) {
         commit('increment');
       }
     },
