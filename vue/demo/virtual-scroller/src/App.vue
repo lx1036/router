@@ -1,14 +1,18 @@
 <template>
   <div id="app">
     <p>asdfasdfsdaf</p>
+    <resize-observer @element-resize="handleResize"></resize-observer>
   </div>
 </template>
 
 <script lang="ts">
   import { Component, Prop, Vue } from 'vue-property-decorator';
+  import ResizeObserver from './components/resize-observer';
 
   @Component({
-    components: {}
+    components: {
+      'resize-observer': ResizeObserver
+    }
   })
   export default class App extends Vue {
     public beforeCreate() {
@@ -33,6 +37,10 @@
 
     public destroyed() {
       console.log('destroy');
+    }
+
+    public handleResize(layout: any) {
+      console.log('resized', layout.width, layout.height);
     }
   }
 </script>
