@@ -12,20 +12,7 @@
   import { mapGetters, mapActions } from 'vuex';
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
-  /**
-   * TODO: convert computed/methods vuex to component class vuex
-   */
-  // @Component
-  // export default class Counter extends Vue {
-  //
-  //
-  //
-  //
-  //
-  // }
-
-
-  export default {
+  @Component({
     computed: mapGetters([
       'evenOrOdd'
     ]),
@@ -35,5 +22,20 @@
       'incrementIfOdd',
       'incrementAsync'
     ])
+  })
+  export default class Counter extends Vue {
+
   }
+
+  /*export default {
+    computed: mapGetters([
+      'evenOrOdd'
+    ]),
+    methods: mapActions([
+      'increment',
+      'decrement',
+      'incrementIfOdd',
+      'incrementAsync'
+    ])
+  }*/
 </script>

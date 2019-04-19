@@ -14,7 +14,7 @@ import Counter from '@/components/Counter.vue';
 @Component({
   components: {
     HelloWorld,
-    Counter
+    Counter,
   },
 })
 export default class Home extends Vue {}
