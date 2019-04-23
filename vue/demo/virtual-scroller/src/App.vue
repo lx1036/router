@@ -2,16 +2,26 @@
   <div id="app">
     <p>asdfasdfsdaf</p>
 <!--    <resize-observer @element-resize="handleResize"></resize-observer>-->
+    <recycle-scroller>
+      <template slot="before">
+        Before
+      </template>
+      <template slot="after">
+        After
+      </template>
+    </recycle-scroller>
   </div>
 </template>
 
 <script lang="ts">
   import { Component, Prop, Vue } from 'vue-property-decorator';
-  import ResizeObserver from './components/resize-observer';
+  import ResizeObserver from './components/resize-observer.vue';
+  import RecycleScroller from "./components/recycle-scroller.vue";
 
   @Component({
     components: {
-      'resize-observer': ResizeObserver
+      'resize-observer': ResizeObserver,
+      'recycle-scroller': RecycleScroller,
     }
   })
   export default class App extends Vue {

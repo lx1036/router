@@ -19,6 +19,7 @@
 <script lang="ts">
   /**
    * @see Slots: https://cn.vuejs.org/v2/guide/components-slots.html
+   * @see Slots 实现原理：https://ustbhuangyi.github.io/vue-analysis/extend/slot.html
    */
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
