@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <p>asdfasdfsdaf</p>
-    <resize-observer @element-resize="handleResize"></resize-observer>
+<!--    <resize-observer @element-resize="handleResize"></resize-observer>-->
   </div>
 </template>
 
