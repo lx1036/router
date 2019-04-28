@@ -13,6 +13,8 @@
     <div v-if="$slots.after" class="vue-recycle-scroller-slot">
       <slot name="after"></slot>
     </div>
+
+    <resize-observer @notify="handleResize"></resize-observer>
   </div>
 </template>
 
@@ -22,12 +24,29 @@
    * @see Slots 实现原理：https://ustbhuangyi.github.io/vue-analysis/extend/slot.html
    */
   import { Component, Prop, Vue } from 'vue-property-decorator';
+  import ResizeObserver from './resize-observer.vue';
 
   @Component({
     name: 'recycle-scroller',
+    components: {'resize-observer': ResizeObserver},
+    directives: {},
   })
   export default class RecycleScroller extends Vue {
     public pool = [];
+    public totalSize = 0;
+    private ready = false;
+
+    handleResize() {
+      this.$emit('resize');
+
+      if (this.ready) {
+        this.updateVisibleItems(false);
+      }
+    }
+
+    updateVisibleItems(checkItem: boolean) {
+
+    }
   }
 </script>
 
