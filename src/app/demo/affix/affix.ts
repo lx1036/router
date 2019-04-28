@@ -1,6 +1,7 @@
 import {Component, NgModule} from '@angular/core';
 import {NzAffixModule} from '../../packages/ng-zorro-antd/affix';
 import {NzButtonModule} from '../../packages/ng-zorro-antd/button';
+import {BrowserModule} from '@angular/platform-browser';
 
 
 
@@ -31,7 +32,7 @@ export class AffixComponent {
 
 
 @NgModule({
-  imports: [NzAffixModule, NzButtonModule],
+  imports: [NzAffixModule, NzButtonModule, BrowserModule],
   exports: [],
   declarations: [AffixComponent],
   providers: [],
