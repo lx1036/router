@@ -24,6 +24,13 @@
   <!--<demo-drag-drop></demo-drag-drop>-->
   <!--<demo-template-ref></demo-template-ref>-->
   <!--<demo-router></demo-router>-->
-  <demo-affix></demo-affix>
+<!--  <demo-affix></demo-affix>-->
+<!--  <router-outlet></router-outlet>-->
+
+  <breadcrumb-basic></breadcrumb-basic>
+  <router-outlet></router-outlet>
+  See the first: <a [routerLink]="'apple'">Apple</a><br>
+  See the second: <a [routerLink]="'apple/steve'">Steve</a><br>
+  See the third: <a [routerLink]="'apple/steve/jobs'">Jobs</a><br>
 </body>
 </html>

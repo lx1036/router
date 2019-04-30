@@ -16,6 +16,7 @@ import {DemoRouterModule} from './app/demo/router/router';
 import {DemoZoneModule} from "./app/demo/zone/zone";
 import {DemoDataTableModule} from './app/demo/datatable/datatable';
 import {AffixModuleDemo} from './app/demo/affix/affix';
+import {BreadcrumbModule} from './app/ant-design/breadcrumb/breadcrumb';
 
 if (environment.production) {
   enableProdMode();
@@ -37,7 +38,8 @@ const platform = platformBrowserDynamic();
 // platform.bootstrapModule(DemoDragDrop)
 // platform.bootstrapModule(DemoView)
 // platform.bootstrapModule(DemoRouterModule)
-platform.bootstrapModule(AffixModuleDemo)
+// platform.bootstrapModule(AffixModuleDemo)
+platform.bootstrapModule(BreadcrumbModule)
   .catch(err => console.log(err));
 
 
