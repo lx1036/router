@@ -6,6 +6,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {InputBoolean} from '../core/decorator';
 import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
+import {StringTemplateOutlet} from '../core/string_template_outlet';
 
 
 
@@ -124,6 +125,7 @@ const routes: Routes = [
   declarations: [
     BreadcrumbComponent,
     BreadcrumbItemComponent,
+    StringTemplateOutlet,
 
     BasicBreadcrumb,
   ],
