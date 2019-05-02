@@ -8,36 +8,6 @@ import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {StringTemplateOutlet} from '../core/string_template_outlet';
 
-
-
-@Component({
-  selector: 'ng-breadcrumb-item',
-  template: `
-    <span class="breadcrumb-link">
-      <ng-content></ng-content>
-    </span>
-    <span class="breadcrumb-separator">
-      <ng-container *stringTemplateOutlet="breadcrumbComponent.separator">
-        {{breadcrumbComponent.separator}}
-      </ng-container>
-    </span>
-  `,
-  styles: [
-    `
-      ng-breadcrumb-item:last-child {
-        
-      }
-      
-      ng-breadcrumb-item:last-child .breadcrumb-separator {
-        display: none
-      }
-    `
-  ]
-})
-export class BreadcrumbItemComponent {
-  constructor(public breadcrumbComponent: BreadcrumbComponent) {}
-}
-
 @Component({
   selector: 'ng-breadcrumb',
   template: `
@@ -110,6 +80,34 @@ export class BreadcrumbComponent implements OnInit, OnDestroy {
       }
     }
   }
+}
+
+@Component({
+  selector: 'ng-breadcrumb-item',
+  template: `
+    <span class="breadcrumb-link">
+      <ng-content></ng-content>
+    </span>
+    <span class="breadcrumb-separator">
+      <ng-container *stringTemplateOutlet="breadcrumbComponent.separator">
+        {{breadcrumbComponent.separator}}
+      </ng-container>
+    </span>
+  `,
+  styles: [
+    `
+      ng-breadcrumb-item:last-child {
+      
+      }
+      
+      ng-breadcrumb-item:last-child .breadcrumb-separator {
+        display: none
+      }
+    `
+  ]
+})
+export class BreadcrumbItemComponent {
+  constructor(public breadcrumbComponent: BreadcrumbComponent) {}
 }
 
 
