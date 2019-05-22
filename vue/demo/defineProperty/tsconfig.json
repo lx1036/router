@@ -16,9 +16,6 @@
       "jest"
     ],
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
     },
     "lib": [
       "esnext",
@@ -28,11 +25,11 @@
     ]
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
-    "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "./src/**/*.ts",
+    "./src/**/*.tsx",
+    "./src/**/*.vue",
+    "./tests/**/*.ts",
+    "./tests/**/*.tsx"
   ],
   "exclude": [
     "node_modules"
