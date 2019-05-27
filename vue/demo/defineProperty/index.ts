@@ -1,6 +1,8 @@
 // cd /Users/liuxiang/rightcapital/rightcapital/router/vue/demo/defineProperty
 // ../../../node_modules/.bin/ts-node index.ts
 
+import {Watcher} from "./watcher";
+
 /**
  * @see https://github.com/answershuto/learnVue/blob/master/docs/%E5%93%8D%E5%BA%94%E5%BC%8F%E5%8E%9F%E7%90%86.MarkDown
  */
