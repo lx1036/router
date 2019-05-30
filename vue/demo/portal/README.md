@@ -7,5 +7,5 @@ A Vue component to render your component's template anywhere in the DOM.
 ## CLI
 
 ```
-yarn serve portal/src/main.ts
+../../node_modules/.bin/vue-cli-service serve -p ./portal/src ./portal/src/main.ts
 ```
