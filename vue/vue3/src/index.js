@@ -1,9 +1,14 @@
-
+/**
+ * ./node_modules/.bin/karma start  vue/vue3/karma.conf.js
+ */
 export class Vue3 {
   constructor(options) {
     this.$options = options;
 
-    return this.initDataProxy();
+    const proxy = this.initDataProxy();
+    this.initWatch();
+
+    return proxy;
   }
 
   /**
@@ -13,12 +18,35 @@ export class Vue3 {
     const data = this.$options.data();
 
     return new Proxy(this, {
-      set(target, key, value, receiver) {
-        data[key] = value;
+      set: (target, key, current, receiver) => {
+        const prev = data[key];
+        data[key] = current;
+
+        if (prev !== current) {
+          this.notify(key, prev, current);
+        }
+
+        return true;
       },
-      get(target, key, receiver) {
+      get: (target, key, receiver) => {
+        if (key in this) {
+          return this[key];
+        }
+
         return data[key];
       }
     });
+  }
+
+  initWatch() {
+    this.dataNotifyChain = {};
+  }
+
+  notify(key, prev, current) {
+    (this.dataNotifyChain[key] || []).forEach((cb) => cb(prev, current));
+  }
+
+  $watch(key, cb) {
+    (this.dataNotifyChain[key]|| []).push(cb);
   }
 }
