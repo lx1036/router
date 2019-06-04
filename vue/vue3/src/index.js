@@ -7,10 +7,10 @@ export class Vue3 {
   constructor(options) {
     this.$options = options;
 
-    const proxy = this.initDataProxy();
+    this.proxy = this.initDataProxy();
     this.initWatch();
 
-    return proxy;
+    return this.proxy;
   }
 
   /**
@@ -31,8 +31,14 @@ export class Vue3 {
         return true;
       },
       get: (target, key, receiver) => {
+        const methods = this.$options.methods || {};
+
         if (key in this) {
           return this[key];
+        }
+
+        if (key in methods) {
+          return methods[key].bind(this.proxy);
         }
 
         return data[key];
@@ -77,7 +83,6 @@ export class Vue3 {
     if (typeof vnode.children === 'string') {
       element.textContent = vnode.children;
     } else {
-      console.log(vnode, vnode.children);
       vnode.children.forEach((child) => {
         if (typeof vnode.children === 'string') {
           element.textContent = vnode.children;
