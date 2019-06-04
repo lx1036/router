@@ -1,5 +1,6 @@
 /**
  * ./node_modules/.bin/karma start  vue/vue3/karma.conf.js
+ * @see https://github.com/zzz945/write-vue3-from-scratch/blob/master/doc/zh-cn.md
  */
 import {VNode} from "./vnode";
 
@@ -80,8 +81,15 @@ export class Vue3 {
   createDOMElement(vnode) {
     const element = document.createElement(vnode.tagName);
 
+    // Element attributes
     for (let key in vnode.attributes) {
       element.setAttribute(key, vnode.attributes[key]);
+    }
+
+    // DOM event listener
+    const events = (vnode.attributes || {}).on || {};
+    for (let key in events) {
+      element.addEventListener(key, events[key]);
     }
 
     if (typeof vnode.children === 'string') {
