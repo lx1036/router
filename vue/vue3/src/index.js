@@ -59,12 +59,16 @@ export class Vue3 {
   }
 
   $mount(root) {
+    const {mounted} = this.$options;
+
     const vnode = this.$options.render(this.createVNode);
     this.$el = this.createDOMElement(vnode);
 
     if (root) {
       root.appendChild(this.$el);
     }
+
+    mounted && mounted.call(this.proxy);
 
     return this;
   }
