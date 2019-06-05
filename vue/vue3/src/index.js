@@ -22,11 +22,15 @@ export class Vue3 {
 
     return new Proxy(this, {
       set: (target, key, current, receiver) => {
-        const prev = data[key];
-        data[key] = current;
-
-        if (prev !== current) {
-          this.notify(key, prev, current);
+        if (key in data) {
+          const prev = data[key];
+          data[key] = current;
+          
+          if (prev !== current) {
+            this.notify(key, prev, current);
+          }
+        } else {
+          this[key] = current;
         }
 
         return true;
@@ -34,15 +38,16 @@ export class Vue3 {
       get: (target, key, receiver) => {
         const methods = this.$options.methods || {};
 
-        if (key in this) {
-          return this[key];
+        if (key in data) {
+          this.$watch(key, this.update.bind(this)); // 依赖收集
+          return data[key];
         }
 
         if (key in methods) {
           return methods[key].bind(this.proxy);
         }
 
-        return data[key];
+        return this[key];
       }
     });
   }
@@ -56,19 +61,20 @@ export class Vue3 {
   }
 
   $watch(key, cb) {
-    (this.dataNotifyChain[key] || []).push(cb);
+    this.dataNotifyChain[key] = this.dataNotifyChain[key] || [];
+    this.dataNotifyChain[key].push(cb);
   }
 
   $mount(root) {
-    const {mounted} = this.$options;
+    const {mounted, render} = this.$options;
 
-    const vnode = this.$options.render(this.createVNode);
+    const vnode = render.call(this.proxy, this.createVNode);
     this.$el = this.createDOMElement(vnode);
 
     if (root) {
       root.appendChild(this.$el);
     }
-
+    
     mounted && mounted.call(this.proxy);
 
     return this;
@@ -86,18 +92,19 @@ export class Vue3 {
       element.setAttribute(key, vnode.attributes[key]);
     }
 
-    // DOM event listener
+    // set DOM event listener
     const events = (vnode.attributes || {}).on || {};
     for (let key in events) {
       element.addEventListener(key, events[key]);
     }
+    
 
-    if (typeof vnode.children === 'string') {
-      element.textContent = vnode.children;
+    if (!Array.isArray(vnode.children)) {
+      element.textContent = vnode.children + '';
     } else {
       vnode.children.forEach((child) => {
-        if (typeof vnode.children === 'string') {
-          element.textContent = vnode.children;
+        if (typeof child === 'string') {
+          element.textContent = child;
         } else {
           element.appendChild(this.createDOMElement(child));
         }
@@ -105,5 +112,25 @@ export class Vue3 {
     }
 
     return element;
+  }
+
+  update() {
+  
+    const parent = this.$el.parent;
+
+    if (parent) {
+      parent.removeChild(this.$el); // 删除旧 view
+    }
+
+    const vnode = this.$options.render.call(this.proxy, this.createVNode);
+    this.$el = this.patch(null, vnode);
+    
+    if (parent) {
+      parent.appendChild(this.$el); // 添加新 view
+    }
+  }
+
+  patch(oldVnode, newVnode) {
+    return this.createDOMElement(newVnode);
   }
 }
