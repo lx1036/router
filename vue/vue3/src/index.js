@@ -160,16 +160,12 @@ export class Vue3 {
 
   update() {
     const parent = this.$el.parentElement;
-
-    if (parent) {
-      parent.removeChild(this.$el); // 删除旧 view
-    }
-
     const vnode = this.$options.render.call(this.proxy, this.createVNode);
+    const oldElement = this.$el;
     this.$el = this.patch(null, vnode);
     
     if (parent) {
-      parent.appendChild(this.$el); // 添加新 view
+      parent.replaceChild(this.$el, oldElement);
     }
   }
 
