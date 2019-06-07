@@ -1,5 +1,5 @@
 /**
- * ./node_modules/.bin/karma start  vue/vue3/karma.conf.js
+ * ./node_modules/.bin/karma start  vue/vue3/karma.conf.js --single-run
  * @see https://github.com/zzz945/write-vue3-from-scratch/blob/master/doc/zh-cn.md
  */
 import {VNode} from "./vnode";
@@ -38,8 +38,12 @@ export class Vue3 {
       get: (target, key, receiver) => {
         const methods = this.$options.methods || {};
 
-        if (key in data) {
-          this.$watch(key, this.update.bind(this)); // 依赖收集
+        if (key in data) { // 收集模板中用了 data 的属性到依赖集合中
+          if (!this.collected) {
+            this.$watch(key, this.update.bind(this)); // 依赖收集
+            this.collected = true;
+          }
+          
           return data[key];
         }
 
@@ -86,6 +90,7 @@ export class Vue3 {
 
   createDOMElement(vnode) {
     const element = document.createElement(vnode.tagName);
+    element.__vue__ = this;
 
     // Element attributes
     for (let key in vnode.attributes) {
@@ -115,8 +120,7 @@ export class Vue3 {
   }
 
   update() {
-  
-    const parent = this.$el.parent;
+    const parent = this.$el.parentElement;
 
     if (parent) {
       parent.removeChild(this.$el); // 删除旧 view
