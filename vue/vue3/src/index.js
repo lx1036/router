@@ -1,5 +1,6 @@
 /**
  * ./node_modules/.bin/karma start vue/vue3/karma.conf.js --single-run
+ * yarn jest -c ./vue/vue3/jest.config.js
  * @see https://github.com/zzz945/write-vue3-from-scratch/blob/master/doc/zh-cn.md
  */
 import {VNode} from "./vnode";

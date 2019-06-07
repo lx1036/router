@@ -1,6 +1,4 @@
 import {Vue3} from "../src";
-import vnode from "../../vue/src/core/vdom/vnode";
-
 
 describe('mvvm', function () {
   it('basic usage', function () {
@@ -89,13 +87,13 @@ describe('mvvm', function () {
     expect(vm.$el.textContent).toEqual('hello');
     vm.a.push('world');
     expect(vm.a[1]).toEqual('world');
-    expect(vm.$el.textContent).toEqual('world');
+    expect(vm.$el.textContent).toEqual('hello');
     vm.a.pop();
     expect(vm.a[0]).toEqual('hello');
     expect(vm.$el.textContent).toEqual('hello');
     vm.a.shift();
     expect(vm.a.length).toEqual(0);
-    expect(vm.$el.textContent).toBeNull();
+    expect(vm.$el.textContent).toEqual('undefined');
     vm.a.unshift('hello');
     expect(vm.a[0]).toEqual('hello');
     expect(vm.$el.textContent).toEqual('hello');
