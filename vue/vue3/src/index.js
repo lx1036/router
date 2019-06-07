@@ -45,6 +45,17 @@ export class Vue3 {
             return data[key];
           }
         },
+        deleteProperty: (target, key) => {
+          if (key in target) {
+            const fullPath = path ? path + '.' + key : key;
+            const pre = target[key];
+            delete target[key];
+      
+            this.notify(fullPath, pre);
+          }
+    
+          return true;
+        }
       };
     };
     
@@ -52,13 +63,6 @@ export class Vue3 {
       set: (target, key, value, receiver) => {
         if (key in data) {
           return createDataProxyHandler().set(data, key, value);
-          
-          /*const prev = data[key];
-          data[key] = value;
-          
-          if (prev !== value) {
-            this.notify(key, prev, value);
-          }*/
         } else {
           this[key] = value;
         }
@@ -70,13 +74,6 @@ export class Vue3 {
 
         if (key in data) { // 收集模板中用了 data 的属性到依赖集合中
           return createDataProxyHandler().get(data, key);
-          
-          /*if (!this.collected) {
-            this.$watch(key, this.update.bind(this)); // 依赖收集
-            this.collected = true;
-          }
-          
-          return data[key];*/
         }
 
         if (key in methods) {
@@ -84,7 +81,7 @@ export class Vue3 {
         }
 
         return this[key];
-      }
+      },
     });
   }
   
