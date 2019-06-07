@@ -1,5 +1,5 @@
 /**
- * ./node_modules/.bin/karma start  vue/vue3/karma.conf.js --single-run
+ * ./node_modules/.bin/karma start vue/vue3/karma.conf.js --single-run
  * @see https://github.com/zzz945/write-vue3-from-scratch/blob/master/doc/zh-cn.md
  */
 import {VNode} from "./vnode";
@@ -19,18 +19,48 @@ export class Vue3 {
    */
   initDataProxy() {
     const data = this.$options.data ? this.$options.data(): {};
-
-    return new Proxy(this, {
-      set: (target, key, current, receiver) => {
-        if (key in data) {
-          const prev = data[key];
-          data[key] = current;
+    
+    const createDataProxyHandler = (path) => {
+      return {
+        set: (data, key, value) => {
+          const fullPath = path ? path + '.' + key : key;
           
-          if (prev !== current) {
-            this.notify(key, prev, current);
+          const prev = data[key];
+          data[key] = value;
+  
+          if (prev !== value) {
+            this.notify(fullPath, prev, value);
           }
+          
+          return true;
+        },
+        get: (data, key) => {
+          const fullPath = path ? path + '.' + key : key;
+          
+          this.collect(fullPath);
+          
+          if (!!data[key] && typeof data[key] === 'object') {
+            return new Proxy(data[key], createDataProxyHandler(fullPath));
+          } else {
+            return data[key];
+          }
+        },
+      };
+    };
+    
+    return new Proxy(this, {
+      set: (target, key, value, receiver) => {
+        if (key in data) {
+          return createDataProxyHandler().set(data, key, value);
+          
+          /*const prev = data[key];
+          data[key] = value;
+          
+          if (prev !== value) {
+            this.notify(key, prev, value);
+          }*/
         } else {
-          this[key] = current;
+          this[key] = value;
         }
 
         return true;
@@ -39,12 +69,14 @@ export class Vue3 {
         const methods = this.$options.methods || {};
 
         if (key in data) { // 收集模板中用了 data 的属性到依赖集合中
-          if (!this.collected) {
+          return createDataProxyHandler().get(data, key);
+          
+          /*if (!this.collected) {
             this.$watch(key, this.update.bind(this)); // 依赖收集
             this.collected = true;
           }
           
-          return data[key];
+          return data[key];*/
         }
 
         if (key in methods) {
@@ -54,6 +86,15 @@ export class Vue3 {
         return this[key];
       }
     });
+  }
+  
+  collect(key) {
+    this.collected = this.collected || {};
+    
+    if (!this.collected[key]) {
+      this.$watch(key, this.update.bind(this)); // 依赖收集
+      this.collected[key] = true;
+    }
   }
 
   initWatch() {

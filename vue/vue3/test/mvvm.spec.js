@@ -17,4 +17,22 @@ describe('mvvm', function () {
     vm.a = 999;
     expect(vm.$el.textContent).toEqual('999');
   });
+  
+  it('deep object', () => {
+    const vm = new Vue3({
+      data() {
+        return {a: {b: 0}};
+      },
+      render(h) {
+        return h('div', null, this.a.b);
+      }
+    }).$mount();
+    
+    expect(vm.a.b).toEqual(0);
+    vm.a.b++;
+    expect(vm.a.b).toEqual(1);
+    expect(vm.$el.textContent).toEqual('1');
+    vm.a.b = 999;
+    expect(vm.$el.textContent).toEqual('999');
+  });
 });
