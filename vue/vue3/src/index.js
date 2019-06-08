@@ -8,7 +8,7 @@ import {VNode} from "./vnode";
 export class Vue3 {
   constructor(options) {
     this.$options = options;
-
+    this.initProps();
     this.proxy = this.initDataProxy();
     this.initWatch();
 
@@ -20,6 +20,7 @@ export class Vue3 {
    */
   initDataProxy() {
     const data = this.$options.data ? this.$options.data(): {};
+    const props = this.$props;
     
     const createDataProxyHandler = (path) => {
       return {
@@ -62,7 +63,9 @@ export class Vue3 {
     
     return new Proxy(this, {
       set: (target, key, value, receiver) => {
-        if (key in data) {
+        if (key in props) { // check in props firstly
+          return createDataProxyHandler().set(props, key, value);
+        } else if (key in data) { // check in data secondly
           return createDataProxyHandler().set(data, key, value);
         } else {
           this[key] = value;
@@ -73,7 +76,9 @@ export class Vue3 {
       get: (target, key, receiver) => {
         const methods = this.$options.methods || {};
 
-        if (key in data) { // 收集模板中用了 data 的属性到依赖集合中
+        if (key in props) {
+          return createDataProxyHandler().get(props, key);
+        } else if (key in data) { // 收集模板中用了 data 的属性到依赖集合中
           return createDataProxyHandler().get(data, key);
         }
 
@@ -83,6 +88,19 @@ export class Vue3 {
 
         return this[key];
       },
+    });
+  }
+  
+  initProps() {
+    this.$props = {};
+    const {props, propsData} = this.$options;
+    
+    if (!props) {
+      return;
+    }
+    
+    props.forEach((prop) => {
+      this.$props[prop] = propsData[prop];
     });
   }
   
