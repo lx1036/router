@@ -129,7 +129,7 @@ export class Vue3 {
   $mount(root) {
     const {mounted, render} = this.$options;
 
-    const vnode = render.call(this.proxy, this.createVNode);
+    const vnode = render.call(this.proxy, this.createElement.bind(this));
     this.$el = this.createDOMElement(vnode);
 
     if (root) {
@@ -141,11 +141,26 @@ export class Vue3 {
     return this;
   }
 
-  createVNode(tagName, attributes, children) {
+  createElement(tagName, attributes, children) {
+    const components = this.$options.components || {};
+    
+    if (tagName in components) {
+      return new VNode(tagName, attributes, children, components[tagName]);
+    }
+    
     return new VNode(tagName, attributes, children);
   }
 
   createDOMElement(vnode) {
+    if (vnode.componentOptions) {
+      const componentInstance = new Vue3(Object.assign({},
+        vnode.componentOptions,{propsData: vnode.attributes.props})).$mount();
+      
+      vnode.componentInstance = componentInstance;
+      
+      return componentInstance.$el;
+    }
+    
     const element = document.createElement(vnode.tagName);
     element.__vue__ = this;
 
@@ -178,7 +193,7 @@ export class Vue3 {
 
   update() {
     const parent = this.$el.parentElement;
-    const vnode = this.$options.render.call(this.proxy, this.createVNode);
+    const vnode = this.$options.render.call(this.proxy, this.createElement.bind(this));
     const oldElement = this.$el;
     this.$el = this.patch(null, vnode);
     
