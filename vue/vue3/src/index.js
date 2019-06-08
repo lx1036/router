@@ -5,12 +5,15 @@
  */
 import {VNode} from "./vnode";
 import {Watcher} from "./watcher";
+import {clearTarget, createProxy, setTarget} from "./proxy";
+import {Dep} from "./dep";
 
 export class Vue3 {
   constructor(options) {
     this.$options = options;
     this.initProps();
-    this.proxy = this.initDataProxy();
+    // this.proxy = this.initDataProxy();
+    this.proxy = createProxy(this);
     this.initWatcher();
     this.initWatch();
 
@@ -115,13 +118,13 @@ export class Vue3 {
       this.collected[key] = true;
     }
     
-    if (this.$target) {
+    /*if (this.$target) {
       this.$watch(key, this.$target.update.bind(this.$target));
-    }
+    }*/
   }
 
   initWatcher() {
-    this.dataNotifyChain = {};
+    this.deps = {};
   }
   
   initWatch() {
@@ -148,20 +151,30 @@ export class Vue3 {
   }
 
   $watch(key, cb) {
-    this.dataNotifyChain[key] = this.dataNotifyChain[key] || [];
-    this.dataNotifyChain[key].push(cb);
+    if (!this.deps[key]) {
+      this.deps[key] = new Dep();
+    }
+    
+    this.deps[key].addSub(new Watcher(this.proxy, key, cb));
+    
+    // this.dataNotifyChain[key] = this.dataNotifyChain[key] || [];
+    // this.dataNotifyChain[key].push(cb);
   }
 
   $mount(root) {
-    const {mounted, render} = this.$options;
-
-    const vnode = render.call(this.proxy, this.createElement.bind(this));
-    this.$el = this.createDOMElement(vnode);
-
-    if (root) {
-      root.appendChild(this.$el);
-    }
+    this.$el = root;
+    // const vnode = render.call(this.proxy, this.createElement.bind(this));
+    // this.$el = this.createDOMElement(vnode);
+    //
+    // if (root) {
+    //   root.appendChild(this.$el);
+    // }
+    setTarget(this);
+    this.update(); // first-time render and trigger 'mounted' hook
+    clearTarget();
     
+    // mounted lifecycle
+    const {mounted} = this.$options;
     mounted && mounted.call(this.proxy);
 
     return this;
