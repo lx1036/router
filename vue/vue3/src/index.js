@@ -21,6 +21,7 @@ export class Vue3 {
   initDataProxy() {
     const data = this.$options.data ? this.$options.data(): {};
     const props = this.$props;
+    const computed = this.$options.computed || {};
     
     const createDataProxyHandler = (path) => {
       return {
@@ -80,9 +81,9 @@ export class Vue3 {
           return createDataProxyHandler().get(props, key);
         } else if (key in data) { // 收集模板中用了 data 的属性到依赖集合中
           return createDataProxyHandler().get(data, key);
-        }
-
-        if (key in methods) {
+        } else if (key in computed) {
+          return computed[key].call(this.proxy);
+        } else if (key in methods) {
           return methods[key].bind(this.proxy);
         }
 
@@ -169,7 +170,7 @@ export class Vue3 {
       element.setAttribute(key, vnode.attributes[key]);
     }
 
-    // set DOM event listener
+    // Set DOM event listener
     const events = (vnode.attributes || {}).on || {};
     for (let key in events) {
       element.addEventListener(key, events[key]);
