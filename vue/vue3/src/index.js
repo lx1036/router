@@ -153,10 +153,10 @@ export class Vue3 {
 
   createDOMElement(vnode) {
     if (vnode.componentOptions) {
-      const componentInstance = new Vue3(Object.assign({},
-        vnode.componentOptions,{propsData: vnode.attributes.props})).$mount();
-      
+      const componentInstance = new Vue3(Object.assign({}, vnode.componentOptions,{propsData: vnode.attributes.props}));
       vnode.componentInstance = componentInstance;
+      componentInstance.$events = (vnode.attributes || {}).on || {};
+      componentInstance.$mount();
       
       return componentInstance.$el;
     }
@@ -189,6 +189,15 @@ export class Vue3 {
     }
 
     return element;
+  }
+  
+  $emit(...options) {
+    const [event, ...payload] = options;
+    const cb = this.$events[event];
+    
+    if (cb) {
+      cb(...payload);
+    }
   }
 
   update() {
