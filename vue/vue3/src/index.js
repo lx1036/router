@@ -4,12 +4,14 @@
  * @see https://github.com/zzz945/write-vue3-from-scratch/blob/master/doc/zh-cn.md
  */
 import {VNode} from "./vnode";
+import {Watcher} from "./watcher";
 
 export class Vue3 {
   constructor(options) {
     this.$options = options;
     this.initProps();
     this.proxy = this.initDataProxy();
+    this.initWatcher();
     this.initWatch();
 
     return this.proxy;
@@ -19,7 +21,7 @@ export class Vue3 {
    * @see https://stackoverflow.com/questions/37714787/can-i-extend-proxy-with-an-es2015-class
    */
   initDataProxy() {
-    const data = this.$options.data ? this.$options.data(): {};
+    const data = this.$data = this.$options.data ? this.$options.data(): {};
     const props = this.$props;
     const computed = this.$options.computed || {};
     
@@ -112,10 +114,33 @@ export class Vue3 {
       this.$watch(key, this.update.bind(this)); // 依赖收集
       this.collected[key] = true;
     }
+    
+    if (this.$target) {
+      this.$watch(key, this.$target.update.bind(this.$target));
+    }
   }
 
-  initWatch() {
+  initWatcher() {
     this.dataNotifyChain = {};
+  }
+  
+  initWatch() {
+    const watch = this.$options.watch || {};
+    const data = this.$data;
+    const computed = this.$options.computed || {};
+    
+    for (let key in watch) {
+      const handler = watch[key];
+      
+      if (key in data) {
+        this.$watch(key, handler.bind(this.proxy));
+      } else if (key in computed) {
+        new Watcher(this.proxy, computed[key], handler);
+      } else {
+        throw 'the watching key must be keys of data or computed';
+      }
+    }
+    
   }
 
   notify(key, prev, current) {
@@ -202,13 +227,16 @@ export class Vue3 {
   }
 
   update() {
-    const parent = this.$el.parentElement;
-    const vnode = this.$options.render.call(this.proxy, this.createElement.bind(this));
-    const oldElement = this.$el;
-    this.$el = this.patch(null, vnode);
+    const parent = (this.$el || {}).parentElement;
     
-    if (parent) {
-      parent.replaceChild(this.$el, oldElement);
+    if (this.$options.render) {
+      const vnode = this.$options.render.call(this.proxy, this.createElement.bind(this));
+      const oldElement = this.$el;
+      this.$el = this.patch(null, vnode);
+  
+      if (parent) {
+        parent.replaceChild(this.$el, oldElement);
+      }
     }
   }
 
