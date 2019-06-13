@@ -24,7 +24,7 @@ module.exports = {
     publicPath: '/'
   },
   plugins: [
-    new CleanWebpackPlugin(),
+    new CleanWebpackPlugin(['./dist']),
     new HtmlWebpackPlugin({
       title: '管理输出'
     }),
