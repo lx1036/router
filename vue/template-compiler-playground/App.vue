@@ -1,24 +1,25 @@
 <template>
-  <div id="app" :class="$style.view">
-    <section>
+  <div id="app" class="app">
+    <section class="editor-wrap editable-wrap">
       <editor @change="handleCodeChange"></editor>
     </section>
 
-    <section>
+    <section class="editor-wrap uneditable-wrap">
       <div>
         <select v-model="displayType">
           <option v-for="(value, key) of types" :key="key" :value="key">{{value}}</option>
         </select>
       </div>
-      <div :class="" v-for="(type, key) of types" v-show="displayType === key" :key="key">
-        <editor :title="type" :read-only="true" :ref="`${key}Editor`"></editor>
+<!--      <div :class="" v-for="(type, key) of types" v-show="displayType === key" :key="key">-->
+      <div v-if="displayType">
+        <editor :title="types[displayType]" :read-only="true" :ref="`${displayType}Editor`"></editor>
       </div>
     </section>
   </div>
 </template>
 
 <script>
-  import Editor from 'Editor.vue';
+  import Editor from './Editor.vue';
   import {compile} from 'vue-template-compiler';
 
   const types = {
@@ -33,8 +34,12 @@
     data() {
       return {
         displayType: 'ast',
-        compiledResult: ''
+        compiledResult: '',
+        types,
       };
+    },
+    watch: {
+      displayType: 'setEditorValue'
     },
     components: {
       'editor': Editor,
@@ -80,6 +85,32 @@
   }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+  .app {
+    display: flex;
+    height: 100%;
+  }
 
+  .editable-wrap {
+    margin-right: 50px;
+  }
+
+  .editor-wrap {
+    flex: 1;
+    flex-shrink: 0;
+    width: 50%;
+  }
+
+  .uneditable-wrap {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .child-editor {
+    flex: 1;
+  }
+
+  .change-type-button {
+    margin: 10px 0;
+  }
 </style>
