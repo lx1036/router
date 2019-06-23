@@ -1,0 +1,2 @@
+
+export const baseOptions: CompilerOptions = {};
