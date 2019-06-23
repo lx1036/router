@@ -23,160 +23,190 @@ type StartTagMatch = {
   end: number,
 }
 
-export class HtmlParser {
-  index = 0;
-  html: string;
-  
-  constructor(public options) {}
+/**
+ * Parse html:
+ * <div>
+ *   <p>{{name}}</p>
+ * </div>
+ * to:
+ *
+ * @param html
+ * @param options
+ */
+
+
+
+export const parseHTML = (html: string, options: any) => {
+  let last: string, lastTag: string;
+  let index = 0;
   
   /**
-   * Parse html:
-   * <div>
-   *   <p>{{name}}</p>
-   * </div>
-   * to:
    *
-   * @param html
-   * @param options
    */
-  parse(html: string, options) {
-    let lastTag;
-    
-    while (html) {
-      // Make sure we're not in a plaintext content element like script/style
-      if (!lastTag || !isPlainTextElement(lastTag)) {
-        let textEnd = html.indexOf('<');
-      
-        if (textEnd === 0) {
-          // Comment: <!--<h1>This is an about page</h1>-->
-          if (comment.test(html)) {
-            const commentEnd = html.indexOf('-->');
-          
-            if (commentEnd >= 0) {
-            
-            }
-          }
-          
-          // <!DOCTYPE html>
-          const doctypeMatch = html.match(doctype);
-          if (doctypeMatch) {
-            this.advance(doctypeMatch[0].length);
-            continue;
-          }
-          
-          // End Tag
-          const endTagMatch = html.match(endTag);
-          if (endTagMatch) {
-            const start = this.index;
-            this.advance(endTagMatch[0].length);
-            this.handleEndTag(endTagMatch[1], start, this.index);
-            continue;
-          }
+  const advance = (step: number) => {
+    index += step;
+    html = html.substring(step);
+  };
   
-          // Start Tag
-          const startTagMatch = this.parseStartTag();
-          if (startTagMatch) {
-            this.handleStartTag(startTagMatch);
-            
-            continue;
-          }
-        }
-        
-        let text;
+  /**
+   *
+   */
+  const parseEndTag = (tagName: string, start: number, end: number) => {
+    let pos, lowerCasedTagName;
+    
+    if (tagName) {
+      lowerCasedTagName = tagName.toLowerCase();
       
-        if (textEnd >= 0) {
-        
-        }
-      
-        if (textEnd < 0) { // html 是文本
-          text = html
-        }
-        
-        if (text) {
-          this.advance(text.length);
-        }
-      } else { // 纯文本内容元素: is the <template> or <script> or <style> tag
-      
-        this.handleEndTag(stackedTag);
-      }
     }
-  }
-  
-  advance(step) {
-    this.index += step;
-    this.html = this.html.substring(step);
-  }
-  
-  parseStartTag(): void | StartTagMatch {
-    const start = this.html.match(startTagOpen); // <div class="box"></div>
     
+  };
+  
+  /**
+   *
+   */
+  const parseStartTag = () => {
+    const start = html.match(startTagOpen); // <div class="box"></div>
+  
     if (start) {
+      let end, attr: {start: number, end: number};
       const match: StartTagMatch = {
         tagName: start[1], // ["<div", "div", index: 0, input: "<div class="box"></div>", groups: undefined]
         attrs: [],
-        start: this.index,
+        start: index,
         unarySlash: '', // 自闭合标签则为 '/'
         end: 0,
       };
-      this.advance(start[0].length); // 截取 <div 后为 ' class="box></div>"'
-      let end, attr: {start: number, end: number};
-  
+      
+      advance(start[0].length); // 截取 <div 后为 ' class="box></div>"'
+      
       /**
        *
        * 依次截取 '<div class="box" id="name"></div>' attr 属性，把
        */
       // ' class="box" id="name"></div>'.match(attribute) -> attr=[" class="box"", "class", "=", "box", undefined, undefined, index: 0, input: " class="box" id="name"></div>", groups: undefined]
-      while (!(end = this.html.match(startTagClose)) && (attr = this.html.match(dynamicArgAttribute) || this.html.match(attribute))) {
-        attr.start = this.index;
-        this.advance(attr[0].length);
-        attr.end = this.index;
+      while (!(end = html.match(startTagClose)) && (attr = html.match(dynamicArgAttribute) || html.match(attribute))) {
+        attr.start = index;
+        advance(attr[0].length);
+        attr.end = index;
         match.attrs.push(attr);
       }
-  
+    
       // startTagClose 开始标签的闭合部分
       if (end) { // [">", "", index: 0, input: "></div>", groups: undefined] or 自闭合标签 ["/>", "/", index: 0, input: "/>", groups: undefined]
         match.unarySlash = end[1];
-        this.advance(end[0].length);
-        match.end = this.index;
-        
+        advance(end[0].length);
+        match.end = index;
+      
         return match;
       }
     }
-    
+  
     return;
-  }
+  };
+  
+  const handleEndTag = () => {};
   
   /**
    * 将 tagName,attrs,unary 等数据取出来，并调用钩子函数把数据存入参数中
-   * @param match
    */
-  handleStartTag(match: StartTagMatch) {
+  const handleStartTag = (match) => {
     const tagName = match.tagName;
     const unarySlash = match.unarySlash;
   
     const l = match.attrs.length;
     const attrs = new Array(l);
-    
+  
     for (let i = 0; i < l; i++) {
     
     }
+  
+    if (options.start) {
+      options.start(tagName, attrs, !!unarySlash, match.start, match.end);
+    }
+  };
+  
+  
+  
+  while (html) {
+    last = html;
     
-    if (this.options.start) {
-      this.options.start(tagName, attrs, !!unarySlash, match.start, match.end);
+    // Make sure we're not in a plaintext content element like script/style
+    if (!lastTag || !isPlainTextElement(lastTag)) {
+      let textEnd = html.indexOf('<');
+      
+      if (textEnd === 0) { // 起始字符是 '<'
+        // Comment: <!--<h1>This is an about page</h1>-->
+        if (comment.test(html)) {
+          const commentEnd = html.indexOf('-->');
+          
+          if (commentEnd >= 0) {
+          
+            advance(commentEnd + 3);
+            continue;
+          }
+        }
+        
+        // <!DOCTYPE html>
+        const doctypeMatch = html.match(doctype);
+        if (doctypeMatch) {
+          advance(doctypeMatch[0].length);
+          continue;
+        }
+        
+        // End Tag
+        const endTagMatch = html.match(endTag);
+        if (endTagMatch) {
+          const start = index;
+          advance(endTagMatch[0].length);
+          parseEndTag(endTagMatch[1], start, index);
+          continue;
+        }
+        
+        // Start Tag
+        const startTagMatch = parseStartTag();
+        if (startTagMatch) {
+          handleStartTag(startTagMatch);
+          
+          continue;
+        }
+      }
+      
+      let text;
+      
+      if (textEnd >= 0) { // 文本字符串里有 '<'
+      
+      }
+      
+      if (textEnd < 0) { // html 是文本
+        text = html
+      }
+      
+      if (text) {
+        advance(text.length);
+      }
+    } else { // 纯文本内容元素: is the <template> or <script> or <style> tag
+      const stackedTag = lastTag.toLowerCase();
+      
+      // parseEndTag(stackedTag);
+    }
+    
+    if (last === html) {
+      break;
     }
   }
   
-  handleEndTag(tagName, start, end) {
   
-  }
-}
+  
+  
+  
+};
 
 
 /**
  * Demo:
  */
 
-const htmlParser = new HtmlParser();
-htmlParser.parse('<template><div><p>{{name}}</p></div></template>', {});
+// const htmlParser = new HtmlParser();
+// htmlParser.parse('<template><div><p>{{name}}</p></div></template>', {});
 
 

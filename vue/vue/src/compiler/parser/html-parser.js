@@ -58,6 +58,7 @@ export function parseHTML (html, options) {
   const canBeLeftOpenTag = options.canBeLeftOpenTag || no
   let index = 0
   let last, lastTag
+  
   while (html) {
     last = html
     // Make sure we're not in a plaintext content element like script/style

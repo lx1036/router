@@ -85,7 +85,7 @@ export interface ASTElement {
   appendAsTree?: boolean;
 }
 
-interface CompilerOptions {
+export interface CompilerOptions {
   modules?: ModuleOptions[];
   directives?: Record<string, DirectiveFunction>;
   preserveWhitespace?: boolean;
@@ -93,5 +93,12 @@ interface CompilerOptions {
   outputSourceRange?: any
 }
 
+export interface CompiledResult<ErrorType> {
+  ast: ASTElement | undefined;
+  render: string;
+  staticRenderFns: string[];
+  errors: ErrorType[];
+  tips: ErrorType[];
+}
 
 

@@ -5,6 +5,6 @@ import {ASTElement, CompilerOptions} from '../types';
 /**
  * Convert HTML string to AST.
  */
-const parse = (template: string, options: CompilerOptions): ASTElement => {
+export const parse = (template: string, options: CompilerOptions): ASTElement => {
 
 };
