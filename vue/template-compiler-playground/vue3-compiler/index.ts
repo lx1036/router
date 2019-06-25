@@ -1,6 +1,7 @@
-// ../../../node_modules/.bin/webpack-dev-server ./index.ts --config ./webpack.config.js
-
 /**
+ * ../../../node_modules/.bin/jest -c ./jest.config.js
+ * ../../../node_modules/.bin/webpack-dev-server ./index.ts --config ./webpack.config.js
+ *
  * @see https://github.com/vuejs/vue/blob/master/src/platforms/web/compiler/index.js
  */
 

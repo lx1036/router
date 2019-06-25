@@ -1,11 +1,67 @@
-import {
-  ASTDirective,
-  ASTElementHandlers,
-  ASTIfCondition,
-  ASTNode, DirectiveFunction,
-  ModuleOptions,
-  SSROptimizability
-} from "vue-template-compiler";
+export type ASTAttr = {
+  name: string;
+  value: any;
+  dynamic?: boolean;
+  start?: number;
+  end?: number
+};
+
+interface ModuleOptions {
+  preTransformNode: (el: ASTElement) => ASTElement | undefined;
+  transformNode: (el: ASTElement) => ASTElement | undefined;
+  postTransformNode: (el: ASTElement) => void;
+  genData: (el: ASTElement) => string;
+  transformCode?: (el: ASTElement, code: string) => string;
+  staticKeys?: string[];
+}
+
+export interface ASTIfCondition {
+  exp: string | undefined;
+  block: ASTElement;
+}
+
+export interface ASTElementHandler {
+  value: string;
+  params?: any[];
+  modifiers: ASTModifiers | undefined;
+}
+
+export interface ASTElementHandlers {
+  [key: string]: ASTElementHandler | ASTElementHandler[];
+}
+
+export interface ASTModifiers {
+  [key: string]: boolean;
+}
+
+export interface ASTDirective {
+  name: string;
+  rawName: string;
+  value: string;
+  arg: string | undefined;
+  modifiers: ASTModifiers | undefined;
+}
+type DirectiveFunction = (node: ASTElement, directiveMeta: ASTDirective) => void;
+
+export interface ASTExpression {
+  type: 2;
+  expression: string;
+  text: string;
+  tokens: (string | Record<string, any>)[];
+  static?: boolean;
+  // 2.4 ssr optimization
+  // ssrOptimizability?: SSROptimizability;
+}
+
+export interface ASTText {
+  type: 3;
+  text: string;
+  static?: boolean;
+  isComment?: boolean;
+  // 2.4 ssr optimization
+  // ssrOptimizability?: SSROptimizability;
+}
+
 
 export interface ASTElement {
   type: 1;
@@ -79,7 +135,7 @@ export interface ASTElement {
   wrapListeners?: (code: string) => string;
   
   // 2.4 ssr optimization
-  ssrOptimizability?: SSROptimizability;
+  // ssrOptimizability?: SSROptimizability;
   
   // weex specific
   appendAsTree?: boolean;
@@ -102,3 +158,6 @@ export interface CompiledResult<ErrorType> {
 }
 
 
+
+
+export type ASTNode = ASTElement | ASTText | ASTExpression;

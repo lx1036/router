@@ -1,12 +1,9 @@
-/* @flow */
-
 import he from 'he'
 import { parseHTML } from './html-parser'
 import { parseText } from './text-parser'
 import { parseFilters } from './filter-parser'
 import { genAssignmentCode } from '../directives/model'
-import { extend, cached, no, camelize, hyphenate } from 'shared/util'
-import { isIE, isEdge, isServerRendering } from 'core/util/env'
+import { extend, cached, no, camelize, hyphenate } from '../../shared/util'
 
 import {
   addProp,
@@ -20,6 +17,8 @@ import {
   pluckModuleFunction,
   getAndRemoveAttrByRegex
 } from '../helpers'
+import {ASTElement, ASTNode, ASTText, CompilerOptions} from "vue-template-compiler";
+import {ASTIfCondition} from "../types";
 
 export const onRE = /^@|^v-on:/
 export const dirRE = process.env.VBIND_PROP_SHORTHAND
@@ -45,6 +44,14 @@ const invalidAttributeRE = /[\s"'<>\/=]/
 const decodeHTMLCached = cached(he.decode)
 
 export const emptySlotScopeToken = `_empty_`
+
+declare type ASTAttr = {
+  name: string;
+  value: any;
+  dynamic?: boolean;
+  start?: number;
+  end?: number
+};
 
 // configurable state
 export let warn: any
@@ -249,7 +256,7 @@ export function parse (
         })
       }
 
-      if (isForbiddenTag(element) && !isServerRendering()) {
+      if (isForbiddenTag(element)) {
         element.forbidden = true
         process.env.NODE_ENV !== 'production' && warn(
           'Templates should only be responsible for mapping the state to the ' +
@@ -327,7 +334,7 @@ export function parse (
       }
       // IE textarea placeholder bug
       /* istanbul ignore if */
-      if (isIE &&
+      if (
         currentParent.tag === 'textarea' &&
         currentParent.attrsMap.placeholder === text
       ) {
@@ -355,8 +362,8 @@ export function parse (
           // condense consecutive whitespaces into single space
           text = text.replace(whitespaceRE, ' ')
         }
-        let res
-        let child: ?ASTNode
+        let res;
+        let child: ASTNode | undefined;
         if (!inVPre && text !== ' ' && (res = parseText(text, delimiters))) {
           child = {
             type: 2,
@@ -508,7 +515,7 @@ type ForParseResult = {
   iterator2?: string;
 };
 
-export function parseFor (exp: string): ?ForParseResult {
+export function parseFor (exp: string): ForParseResult|void {
   const inMatch = exp.match(forAliasRE)
   if (!inMatch) return
   const res = {}

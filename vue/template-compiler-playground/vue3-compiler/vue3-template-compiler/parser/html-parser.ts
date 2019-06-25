@@ -39,6 +39,7 @@ type StartTagMatch = {
 export const parseHTML = (html: string, options: any) => {
   let last: string, lastTag: string;
   let index = 0;
+  const expectHTML = options.expectHTML;
   
   /**
    *
