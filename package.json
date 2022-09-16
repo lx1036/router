@@ -22,7 +22,7 @@
     "@angular/pwa": "^0.7.4",
     "@ant-design/icons-angular": "^2.0.1",
     "@swimlane/ngx-datatable": "^14.0.0",
-    "bootstrap": "^4.1.1",
+    "bootstrap": "^4.3.1",
     "clean-webpack-plugin": "^0.1.19",
     "codemirror": "^5.47.0",
     "core-js": "^2.5.4",
